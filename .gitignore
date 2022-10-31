@@ -1,0 +1,7 @@
+.vscode/*
+api.log
+tmp/*
+.env
+nginx-conf/*
+gin-bin.exe
+log/*

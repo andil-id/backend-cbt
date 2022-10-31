@@ -1,0 +1,60 @@
+name: Deploy Dev
+on:
+  workflow_dispatch:
+jobs:
+  Deploy:
+    name: Deploy
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repo
+        uses: actions/checkout@v3
+      - name: Setup Golang
+        uses: actions/setup-go@v3
+        with:
+          go-version: '1.18'
+          cache: true
+      - name: Build Binary
+        run: |
+          go mod download
+          CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -a -ldflags="-s -w" -o bin/main .
+      - name: Remove old Binary
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          username: ${{ secrets.SSH_USERNAME }}
+          key: ${{ secrets.SSH_SECRET }}
+          port: ${{ secrets.SSH_PORT }}
+          script: |
+            rm -rf /home/$USER/app/backend-dev/bin/main
+      - name: Copy App
+        uses: appleboy/scp-action@master
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          username: ${{ secrets.SSH_USERNAME }}
+          key: ${{ secrets.SSH_SECRET }}
+          port: ${{ secrets.SSH_PORT }}
+          source: "./bin/main"
+          target: "/home/$USER/app/backend-dev/bin/"
+          overwrite: true
+      - name: Move new Binary
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          username: ${{ secrets.SSH_USERNAME }}
+          key: ${{ secrets.SSH_SECRET }}
+          port: ${{ secrets.SSH_PORT }}
+          script: |
+            cp /home/$USER/app/backend-dev/bin/bin/main /home/$USER/app/backend-dev/bin/main
+            chmod +x /home/andil/app/backend-dev/bin/main
+            rm -rf /home/$USER/app/backend-dev/bin/bin
+      - name: Deploy
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          username: ${{ secrets.SSH_USERNAME }}
+          key: ${{ secrets.SSH_SECRET }}
+          port: ${{ secrets.SSH_PORT }}
+          script: |
+            sudo systemctl restart api-dev
+            sudo systemctl restart nginx
+            sudo systemctl daemon-reload

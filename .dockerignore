@@ -1,0 +1,17 @@
+tmp/*
+.github/*
+.git/*
+.hg/*
+.idea/*
+.project/*
+.settings/*
+.svn/*
+.tox/*
+.vscode/*
+.vscode-test/*
+test/*
+.air.toml
+docker-compose.yaml
+README.md
+LICENSE
+doc/*

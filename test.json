@@ -1,0 +1,25 @@
+{
+  "id": "ord_2hnD7u24g41481",
+  "items": [
+      {
+          "qty": 1,
+          "name": "Tagihan Keamanan",
+          "price": "30000.00"
+      },
+      {
+          "qty": 1,
+          "name": "Tagihan Sampah",
+          "price": "15000.00"
+      }
+  ],
+  "amount": "45000.00",
+  "status": "started",
+  "currency": "IDR",
+  "created_at": "2022-06-12T13:32:40.721712Z",
+  "updated_at": "2022-06-12T13:32:40.721712Z",
+  "customer_id": "cus_CZYaLvsZuL5897",
+  "expiry_date": "2022-07-12T13:32:40.718983Z",
+  "access_token": "2d5c84d38eac7cb63fa1b8ec6061bca6fcbb95b5c0380b7c6219fb90ceffcd69",
+  "order_ref_id": "order2314",
+  "payment_option": "full_payment"
+}
