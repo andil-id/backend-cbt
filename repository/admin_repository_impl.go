@@ -35,7 +35,7 @@ func (repository *AdminRepositoryImpl) GetAdminById(ctx context.Context, tx *sql
 	}
 }
 func (repository *AdminRepositoryImpl) SaveAdmin(ctx context.Context, tx *sql.Tx, admin domain.Admin) error {
-	SQL := "INSERT INTO `table_admin`(`id_admin`, `nama_admin`, `username`, `password`, `created_at`, `updated_at`) VALUES ('?','?','?','?','?','')"
+	SQL := "INSERT INTO table_admin (id_admin, nama_admin, username, password, created_at, updated_at) VALUES (?,?,?,?,?,?)"
 	id := ksuid.New().String()
 	_, err := tx.ExecContext(ctx, SQL, id, admin.NamaAdmin, admin.UsernameAdmin, admin.PasswordAdmin, time.Now(), time.Now())
 	if err != nil {
@@ -44,7 +44,7 @@ func (repository *AdminRepositoryImpl) SaveAdmin(ctx context.Context, tx *sql.Tx
 	return nil
 }
 func (repository *AdminRepositoryImpl) DeleteAdmin(ctx context.Context, tx *sql.Tx, id string) error {
-	SQL := "DELETE FROM `table_admin` WHERE id_admin = ?"
+	SQL := "DELETE FROM table_admin WHERE id_admin = ?"
 	_, err := tx.ExecContext(ctx, SQL, id)
 	if err != nil {
 		return err
@@ -52,7 +52,7 @@ func (repository *AdminRepositoryImpl) DeleteAdmin(ctx context.Context, tx *sql.
 	return nil
 }
 func (repository *AdminRepositoryImpl) GetAllAdmin(ctx context.Context, tx *sql.Tx) ([]domain.Admin, error) {
-	SQL := "SELECT * FROM `table_admin` LIMIT 10"
+	SQL := "SELECT * FROM table_admin LIMIT 10"
 	rows, err := tx.QueryContext(ctx, SQL)
 	if err != nil {
 		panic(err)
@@ -70,7 +70,7 @@ func (repository *AdminRepositoryImpl) GetAllAdmin(ctx context.Context, tx *sql.
 	return allAdmin, nil
 }
 func (repository *AdminRepositoryImpl) FindAdminByUsername(ctx context.Context, tx *sql.Tx, username string) (domain.Admin, error) {
-	SQL := "SELECT * FROM `table_admin` WHERE username = ?"
+	SQL := "SELECT * FROM table_admin WHERE username = ?"
 	rows, err := tx.QueryContext(ctx, SQL, username)
 	if err != nil {
 		panic(err)
@@ -89,7 +89,7 @@ func (repository *AdminRepositoryImpl) FindAdminByUsername(ctx context.Context, 
 	}
 }
 func (repository *AdminRepositoryImpl) UpdatePasswordAdmin(ctx context.Context, tx *sql.Tx, username string, password string) error {
-	SQL := "UPDATE `table_admin` SET `password`='?', `updated_at`='?' WHERE username = ?"
+	SQL := "UPDATE table_admin SET password=?, updated_at=? WHERE username = ?"
 	_, err := tx.ExecContext(ctx, SQL, password, time.Now(), username)
 	if err != nil {
 		return err
@@ -97,7 +97,7 @@ func (repository *AdminRepositoryImpl) UpdatePasswordAdmin(ctx context.Context, 
 	return nil
 }
 func (repository *AdminRepositoryImpl) UpdateProfileAdmin(ctx context.Context, tx *sql.Tx, id string, admin domain.Admin) error {
-	SQL := "UPDATE `table_admin` SET `nama_admin`='?',`username`='?',`password`='?', `updated_at`='?' WHERE id_admin = ?"
+	SQL := "UPDATE table_admin SET nama_admin=?,username=?,password=?, updated_at=? WHERE id_admin = ?"
 	_, err := tx.ExecContext(ctx, SQL, admin.NamaAdmin, admin.UsernameAdmin, admin.PasswordAdmin, time.Now(), id)
 	if err != nil {
 		return err

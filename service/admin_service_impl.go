@@ -3,13 +3,11 @@ package service
 import (
 	"context"
 	"database/sql"
-	"time"
 
 	"github.com/andil-id/api/exception"
 	"github.com/andil-id/api/helper"
 	"github.com/andil-id/api/model/domain"
 	"github.com/andil-id/api/model/web"
-	"github.com/andil-id/api/pkg"
 	"github.com/andil-id/api/repository"
 	"github.com/go-playground/validator/v10"
 	_ "github.com/joho/godotenv/autoload"
@@ -48,7 +46,7 @@ func (service *AdminServiceImpl) RegisterAdmin(ctx context.Context, request web.
 	// * check avaliable email
 	_, err = service.AdminRepository.FindAdminByUsername(ctx, tx, request.UsernameAdmin)
 	if err == nil {
-		return e.Wrap(exception.ErrNotFound, "Email has alredy taken for other user")
+		return e.Wrap(exception.ErrNotFound, "Username has alredy taken for other user")
 	}
 	// * generate password hash
 	bytes, err := bcrypt.GenerateFromPassword([]byte(request.PasswordAdmin), 12)
@@ -56,16 +54,11 @@ func (service *AdminServiceImpl) RegisterAdmin(ctx context.Context, request web.
 		return err
 	}
 	passwordHash := string(bytes)
-	// * generate special code
-	uuid := pkg.SpecialKode()
 	// * save admin to db
 	admin := domain.Admin{
-		IdAdmin:       uuid,
 		NamaAdmin:     request.NamaAdmin,
 		UsernameAdmin: request.UsernameAdmin,
 		PasswordAdmin: passwordHash,
-		CreatedAt:     time.Now(),
-		UpdatedAt:     time.Now(),
 	}
 	err = service.AdminRepository.SaveAdmin(ctx, tx, admin)
 	if err != nil {
