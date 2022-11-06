@@ -32,6 +32,9 @@ func jsonErrorReporter(errType gin.ErrorType) gin.HandlerFunc {
 		if badRequestError(c, err) {
 			return
 		}
+		if serviceError(c, err) {
+			return
+		}
 		internalServerError(c, err)
 	}
 }
@@ -75,6 +78,21 @@ func badRequestError(c *gin.Context, err error) bool {
 	if e.Cause(err) == ErrBadRequest {
 		errorMessage := strings.Split(err.Error(), ":")
 		c.IndentedJSON(http.StatusBadRequest, gin.H{
+			"code":    http.StatusBadRequest,
+			"message": errorMessage[0],
+			"data":    nil,
+		})
+		c.Abort()
+		return true
+	} else {
+		return false
+	}
+}
+
+func serviceError(c *gin.Context, err error) bool {
+	if e.Cause(err) == ErrService {
+		errorMessage := strings.Split(err.Error(), ":")
+		c.IndentedJSON(http.StatusInternalServerError, gin.H{
 			"code":    http.StatusBadRequest,
 			"message": errorMessage[0],
 			"data":    nil,
