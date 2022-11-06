@@ -4,6 +4,7 @@ import (
 	"context"
 	"database/sql"
 	"errors"
+	"log"
 	"time"
 
 	"github.com/andil-id/api/model/domain"
@@ -17,16 +18,16 @@ func NewUserRepository() UserRepository {
 	return &UserRepositoryImpl{}
 }
 
-func (repo *UserRepositoryImpl) GetUserById(ctx context.Context, tx *sql.Tx, id string) (domain.User, error) {
-	SQL := "SELECT * FROM table_user WHERE id_user = ? LIMIT 1"
+func (repo *UserRepositoryImpl) GetUserById(ctx context.Context, tx *sql.Tx, id string) (domain.Users, error) {
+	SQL := "SELECT * FROM users WHERE id_user = ? LIMIT 1"
 	rows, err := tx.QueryContext(ctx, SQL, id)
 	if err != nil {
 		panic(err)
 	}
 	defer rows.Close()
-	var user domain.User
+	var user domain.Users
 	if rows.Next() {
-		err := rows.Scan(&user.IdUser, &user.NamaUser, &user.NamaOrtu, &user.EmailUser, &user.PasswordUser, &user.NoHandphoneUser, &user.NoHandphoneOrtu, &user.AlamatUser, &user.AlamatSekolah, &user.CreatedAt, &user.UpdatedAt)
+		err := rows.Scan(&user.Id, &user.Name, &user.ParentName, &user.Email, &user.Password, &user.PhoneNumber, &user.ParentPhoneNumber, &user.Address, &user.SchoolAddress, &user.CreatedAt, &user.UpdatedAt)
 		if err != nil {
 			panic(err)
 		}
@@ -35,34 +36,35 @@ func (repo *UserRepositoryImpl) GetUserById(ctx context.Context, tx *sql.Tx, id 
 		return user, errors.New("data not found")
 	}
 }
-func (repo *UserRepositoryImpl) SaveUser(ctx context.Context, tx *sql.Tx, user domain.User) error {
-	SQL := "INSERT INTO table_user (id_user, nama_user, no_handphone, alamat_asal, alamat_sekolah, email_user, password_user, nama_ortu, no_hp_ortu, created_at, updated_at) VALUES (?,?,?,?,?,?,?,?,?,?,?)"
+func (repo *UserRepositoryImpl) SaveUser(ctx context.Context, tx *sql.Tx, user domain.Users) (string, error) {
+	SQL := "INSERT INTO users (id, name, username, phone_number, address, school_address, email, password, parent_name, parent_phone_number, created_at, updated_at) VALUES (?,?,?,?,?,?,?,?,?,?,?,?)"
 	id := ksuid.New().String()
-	_, err := tx.ExecContext(ctx, SQL, id, user.NamaUser, user.NoHandphoneUser, user.AlamatUser, user.AlamatSekolah, user.EmailUser, user.PasswordUser, user.NamaOrtu, user.NoHandphoneOrtu, time.Now(), time.Now())
+	log.Println("ini parent name", user.ParentName)
+	_, err := tx.ExecContext(ctx, SQL, id, user.Name, user.Username, user.PhoneNumber, user.Address, user.Address, user.Email, user.Password, user.ParentName, user.ParentPhoneNumber, time.Now(), time.Now())
 	if err != nil {
-		return err
+		return "", err
 	}
-	return nil
+	return id, nil
 }
 func (repo *UserRepositoryImpl) DeleteUser(ctx context.Context, tx *sql.Tx, id string) error {
-	SQL := "DELETE FROM table_user WHERE id_user = ?"
+	SQL := "DELETE FROM users WHERE id = ?"
 	_, err := tx.ExecContext(ctx, SQL, id)
 	if err != nil {
 		return err
 	}
 	return nil
 }
-func (repo *UserRepositoryImpl) GetAllUser(ctx context.Context, tx *sql.Tx) ([]domain.User, error) {
-	SQL := "SELECT * FROM table_user LIMIT 10"
+func (repo *UserRepositoryImpl) GetAllUser(ctx context.Context, tx *sql.Tx) ([]domain.Users, error) {
+	SQL := "SELECT * FROM users LIMIT 10"
 	rows, err := tx.QueryContext(ctx, SQL)
 	if err != nil {
 		panic(err)
 	}
 	defer rows.Close()
-	var user []domain.User
+	var user []domain.Users
 	for rows.Next() {
-		var u domain.User
-		err := rows.Scan(&u.IdUser, &u.NamaUser, &u.NamaOrtu, &u.EmailUser, &u.NoHandphoneUser, &u.NoHandphoneOrtu, &u.AlamatUser, &u.AlamatSekolah, &u.CreatedAt, &u.UpdatedAt)
+		var u domain.Users
+		err := rows.Scan(&u.Id, &u.Name, &u.ParentName, &u.Email, &u.PhoneNumber, &u.ParentPhoneNumber, &u.Address, &u.SchoolAddress, &u.CreatedAt, &u.UpdatedAt)
 		if err != nil {
 			panic(err)
 		}
@@ -70,17 +72,17 @@ func (repo *UserRepositoryImpl) GetAllUser(ctx context.Context, tx *sql.Tx) ([]d
 	}
 	return user, nil
 }
-func (repo *UserRepositoryImpl) FindUserByEmail(ctx context.Context, tx *sql.Tx, email string) (domain.User, error) {
-	SQL := "SELECT * FROM table_user WHERE email_user = ? LIMIT 1"
+func (repo *UserRepositoryImpl) FindUserByEmail(ctx context.Context, tx *sql.Tx, email string) (domain.Users, error) {
+	SQL := "SELECT * FROM users WHERE email = ? LIMIT 1"
 	rows, err := tx.QueryContext(ctx, SQL, email)
 
 	if err != nil {
 		panic(err)
 	}
 	defer rows.Close()
-	var user domain.User
+	var user domain.Users
 	if rows.Next() {
-		err := rows.Scan(&user.IdUser, &user.NamaUser, &user.NamaOrtu, &user.EmailUser, &user.NoHandphoneUser, &user.NoHandphoneOrtu, &user.AlamatUser, &user.AlamatSekolah, &user.CreatedAt, &user.UpdatedAt)
+		err := rows.Scan(&user.Id, &user.Name, &user.ParentName, &user.Email, &user.PhoneNumber, &user.ParentPhoneNumber, &user.Address, &user.SchoolAddress, &user.CreatedAt, &user.UpdatedAt)
 		if err != nil {
 			panic(err)
 		}
@@ -89,16 +91,16 @@ func (repo *UserRepositoryImpl) FindUserByEmail(ctx context.Context, tx *sql.Tx,
 		return user, errors.New("data not found")
 	}
 }
-func (repo *UserRepositoryImpl) UpdateProfileUser(ctx context.Context, tx *sql.Tx, id string, user domain.User) error {
-	SQL := "UPDATE table_user SET nama_user=?,no_handphone=?,alamat_asal=?,alamat_sekolah=?,email_user=?,nama_ortu=?,no_hp_ortu=?,updated_at=? WHERE id_user = ?"
-	_, err := tx.ExecContext(ctx, SQL, user.NamaUser, user.NoHandphoneUser, user.AlamatUser, user.AlamatSekolah, user.EmailUser, user.NamaOrtu, user.NoHandphoneOrtu, time.Now(), id)
+func (repo *UserRepositoryImpl) UpdateProfileUser(ctx context.Context, tx *sql.Tx, id string, user domain.Users) error {
+	SQL := "UPDATE users SET name=?,phone_number=?,address=?,school_address=?,email=?,parent_name=?,parent_phone_number=?,updated_at=? WHERE id = ?"
+	_, err := tx.ExecContext(ctx, SQL, user.Name, user.PhoneNumber, user.Address, user.SchoolAddress, user.Email, user.ParentName, user.ParentPhoneNumber, time.Now(), id)
 	if err != nil {
 		return err
 	}
 	return nil
 }
 func (repo *UserRepositoryImpl) UpdatePasswordUser(ctx context.Context, tx *sql.Tx, email string, pasword string) error {
-	SQL := "UPDATE table_user SET password_user = ? WHERE email_user = ?"
+	SQL := "UPDATE users SET password = ? WHERE email = ?"
 	_, err := tx.ExecContext(ctx, SQL, pasword, email)
 	if err != nil {
 		return err
