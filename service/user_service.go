@@ -7,7 +7,7 @@ import (
 )
 
 type UserService interface {
-	RegisterUser(ctx context.Context, user web.RegisterUserRequest) error
+	RegisterUser(ctx context.Context, user web.RegisterUserRequest) (web.UserResponse, error)
 	GetUserById(ctx context.Context, id string) (web.UserResponse, error)
 	GetAllUser(ctx context.Context) ([]web.UserResponse, error)
 	UpdateProfileUser(ctx context.Context, id string, user web.UpdateProfileUserRequest) error

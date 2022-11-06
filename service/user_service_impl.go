@@ -1,14 +1,22 @@
 package service
 
 import (
+	"bytes"
 	"context"
 	"database/sql"
+	"encoding/json"
+	"fmt"
+	"log"
+	"net/http"
+	"os"
+	"strings"
 	"time"
 
 	"github.com/andil-id/api/exception"
 	"github.com/andil-id/api/helper"
 	"github.com/andil-id/api/model/domain"
 	"github.com/andil-id/api/model/web"
+	"github.com/andil-id/api/model/web/moodle"
 	"github.com/andil-id/api/repository"
 	"github.com/go-playground/validator/v10"
 	e "github.com/pkg/errors"
@@ -41,53 +49,114 @@ func (s *UserServiceImpl) GetUserById(ctx context.Context, id string) (web.UserR
 		return response_pengguna, e.Wrap(exception.ErrNotFound, err.Error())
 	}
 	response_pengguna = web.UserResponse{
-		IdUser:          pengguna.IdUser,
-		NamaUser:        pengguna.NamaUser,
-		NamaOrtu:        pengguna.NamaOrtu,
-		EmailUser:       pengguna.EmailUser,
-		NoHandphoneUser: pengguna.NoHandphoneUser,
-		NoHandphoneOrtu: pengguna.NoHandphoneOrtu,
-		AlamatSekolah:   pengguna.AlamatSekolah,
-		AlamatUser:      pengguna.AlamatUser,
-		CreatedAt:       pengguna.CreatedAt,
-		UpdatedAt:       pengguna.UpdatedAt,
+		Id:                pengguna.Id,
+		Name:              pengguna.Name,
+		ParentName:        pengguna.ParentName,
+		Email:             pengguna.Email,
+		PhoneNumber:       pengguna.PhoneNumber,
+		ParentPhoneNumber: pengguna.ParentPhoneNumber,
+		SchoolAddress:     pengguna.SchoolAddress,
+		Address:           pengguna.Address,
+		CreatedAt:         pengguna.CreatedAt,
+		UpdatedAt:         pengguna.UpdatedAt,
 	}
 	return response_pengguna, nil
 }
-func (s *UserServiceImpl) RegisterUser(ctx context.Context, pengguna web.RegisterUserRequest) error {
-	err := s.Validate.Struct(pengguna)
+func (s *UserServiceImpl) RegisterUser(ctx context.Context, user web.RegisterUserRequest) (web.UserResponse, error) {
+	registeredUser := web.UserResponse{}
+
+	err := s.Validate.Struct(user)
 	if err != nil {
-		return err
+		return registeredUser, err
 	}
 	tx, err := s.DB.Begin()
 	if err != nil {
 		panic(err)
 	}
 	defer helper.CommitOrRollback(tx)
-	_, err = s.UserRepository.FindUserByEmail(ctx, tx, pengguna.EmailUser)
+	_, err = s.UserRepository.FindUserByEmail(ctx, tx, user.Email)
 	if err == nil {
-		return e.Wrap(exception.ErrNotFound, "Email has alredy taken for other user")
+		return registeredUser, e.Wrap(exception.ErrNotFound, "Email has alredy taken for other user")
 	}
-	bytes, err := bcrypt.GenerateFromPassword([]byte(pengguna.PasswordUser), 12)
+
+	sliceName := strings.Split(user.Name, " ")
+	firstName := sliceName[0]
+	lastName := strings.Join(sliceName[1:], " ")
+	reqBody := moodle.UserCreateRequest{
+		Users: []moodle.Users{
+			{
+				Username:  user.Username,
+				Password:  user.Password,
+				Firstname: firstName,
+				Lastname:  lastName,
+				Email:     user.Email,
+			},
+		},
+	}
+	jsonReq, err := json.Marshal(reqBody)
 	if err != nil {
-		return err
+		return registeredUser, err
 	}
+
+	baseUrl := os.Getenv("BASE_URL")
+	token := os.Getenv("MOODLE_TOKEN")
+	client := &http.Client{}
+	r, err := http.NewRequestWithContext(ctx, http.MethodPost, fmt.Sprintf("%s/core_user_create_users", baseUrl), bytes.NewBuffer(jsonReq))
+	if err != nil {
+		return registeredUser, err
+	}
+	r.Header = http.Header{
+		"Content-Type":  {"application/json"},
+		"Accept":        {"application/json"},
+		"Authorization": {token},
+	}
+	res, err := client.Do(r)
+	if err != nil {
+		return registeredUser, err
+	}
+	defer res.Body.Close()
+	if res.StatusCode != http.StatusOK {
+		log.Println("http statuscode --", res.StatusCode)
+		return registeredUser, e.Wrap(exception.ErrService, "error when create user in moodle")
+	}
+
+	bytes, err := bcrypt.GenerateFromPassword([]byte(user.Password), 12)
+	if err != nil {
+		return registeredUser, err
+	}
+	createdAt := time.Now()
+	updatedAt := time.Now()
 	passwordHash := string(bytes)
-	err = s.UserRepository.SaveUser(ctx, tx, domain.User{
-		NamaUser:        pengguna.NamaUser,
-		EmailUser:       pengguna.EmailUser,
-		PasswordUser:    passwordHash,
-		NoHandphoneUser: pengguna.NoHandphoneUser,
-		NoHandphoneOrtu: pengguna.NoHandphoneOrtu,
-		AlamatSekolah:   pengguna.AlamatSekolah,
-		AlamatUser:      pengguna.AlamatUser,
-		CreatedAt:       time.Now(),
-		UpdatedAt:       time.Now(),
+	id, err := s.UserRepository.SaveUser(ctx, tx, domain.Users{
+		Name:              user.Name,
+		Username:          user.Username,
+		Email:             user.Email,
+		Password:          passwordHash,
+		PhoneNumber:       user.PhoneNumber,
+		ParentPhoneNumber: user.ParentPhoneNumber,
+		SchoolAddress:     user.SchoolAddress,
+		Address:           user.Address,
+		ParentName:        user.ParentName,
+		CreatedAt:         createdAt,
+		UpdatedAt:         updatedAt,
 	})
 	if err != nil {
-		return err
+		return registeredUser, err
 	}
-	return nil
+	registeredUser = web.UserResponse{
+		Id:                id,
+		Name:              user.Name,
+		Username:          user.Username,
+		Email:             user.Email,
+		PhoneNumber:       user.PhoneNumber,
+		Address:           user.Address,
+		SchoolAddress:     user.SchoolAddress,
+		ParentName:        user.ParentName,
+		ParentPhoneNumber: user.ParentPhoneNumber,
+		CreatedAt:         createdAt,
+		UpdatedAt:         updatedAt,
+	}
+	return registeredUser, nil
 }
 func (s *UserServiceImpl) DeleteUser(ctx context.Context, id string) error {
 	tx, err := s.DB.Begin()
@@ -111,15 +180,15 @@ func (s *UserServiceImpl) GetAllUser(ctx context.Context) ([]web.UserResponse, e
 	}
 	for _, p := range pengguna {
 		response_pengguna = append(response_pengguna, web.UserResponse{
-			IdUser:          p.IdUser,
-			NamaUser:        p.NamaUser,
-			EmailUser:       p.EmailUser,
-			NoHandphoneUser: p.NoHandphoneUser,
-			NoHandphoneOrtu: p.NoHandphoneOrtu,
-			AlamatUser:      p.AlamatUser,
-			AlamatSekolah:   p.AlamatSekolah,
-			CreatedAt:       p.CreatedAt,
-			UpdatedAt:       p.UpdatedAt,
+			Id:                p.Id,
+			Name:              p.Name,
+			Email:             p.Email,
+			PhoneNumber:       p.PhoneNumber,
+			ParentPhoneNumber: p.ParentPhoneNumber,
+			Address:           p.Address,
+			SchoolAddress:     p.SchoolAddress,
+			CreatedAt:         p.CreatedAt,
+			UpdatedAt:         p.UpdatedAt,
 		})
 	}
 	return response_pengguna, nil
@@ -133,21 +202,21 @@ func (s *UserServiceImpl) UpdateProfileUser(ctx context.Context, id string, requ
 	if err != nil {
 		panic(err)
 	}
-	bytes, err := bcrypt.GenerateFromPassword([]byte(request.PasswordUser), 12)
+	bytes, err := bcrypt.GenerateFromPassword([]byte(request.Password), 12)
 	if err != nil {
 		return err
 	}
 	passwordHash := string(bytes)
 	defer helper.CommitOrRollback(tx)
-	s.UserRepository.UpdateProfileUser(ctx, tx, id, domain.User{
-		NamaUser:        request.NamaUser,
-		EmailUser:       request.EmailUser,
-		PasswordUser:    passwordHash,
-		NoHandphoneUser: request.NoHandphoneUser,
-		NoHandphoneOrtu: request.NoHandphoneOrtu,
-		AlamatSekolah:   request.AlamatSekolah,
-		AlamatUser:      request.AlamatUser,
-		UpdatedAt:       time.Now(),
+	s.UserRepository.UpdateProfileUser(ctx, tx, id, domain.Users{
+		Name:              request.Name,
+		Email:             request.Email,
+		Password:          passwordHash,
+		PhoneNumber:       request.PhoneNumber,
+		ParentPhoneNumber: request.ParentPhoneNumber,
+		SchoolAddress:     request.SchoolAddress,
+		Address:           request.Address,
+		UpdatedAt:         time.Now(),
 	})
 	return nil
 }

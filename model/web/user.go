@@ -5,35 +5,38 @@ import (
 )
 
 type RegisterUserRequest struct {
-	NamaUser        string `json:"nama_user" binding:"required"`
-	NamaOrtu        string `json:"nama_ortu" binding:"required"`
-	EmailUser       string `json:"email_user" binding:"required"`
-	PasswordUser    string `json:"password_user" binding:"required"`
-	NoHandphoneUser string `json:"no_hp" binding:"required"`
-	NoHandphoneOrtu string `json:"no_hp_ortu" binding:"required"`
-	AlamatSekolah   string `json:"alamat_sekolah" binding:"required"`
-	AlamatUser      string `json:"alamat_user" binding:"required"`
+	Name              string `json:"name" binding:"required"`
+	Username          string `json:"username" binding:"required"`
+	ParentName        string `json:"parent_name" binding:"required"`
+	Email             string `json:"email" binding:"required"`
+	Password          string `json:"password" binding:"required"`
+	PhoneNumber       string `json:"phone_number" binding:"required"`
+	ParentPhoneNumber string `json:"parent_phone_number" binding:"required"`
+	SchoolAddress     string `json:"school_address" binding:"required"`
+	Address           string `json:"address" binding:"required"`
 }
 
 type UserResponse struct {
-	IdUser          string    `json:"id_user"`
-	NamaUser        string    `json:"nama_user"`
-	NamaOrtu        string    `json:"nama_ortu"`
-	EmailUser       string    `json:"email_user"`
-	NoHandphoneUser string    `json:"no_hp"`
-	NoHandphoneOrtu string    `json:"no_hp_ortu"`
-	AlamatSekolah   string    `json:"alamat_sekolah"`
-	AlamatUser      string    `json:"alamat_user"`
-	CreatedAt       time.Time `json:"created_at"`
-	UpdatedAt       time.Time `json:"updated_at"`
+	Id                string    `json:"id"`
+	Name              string    `json:"name"`
+	Username          string    `json:"username"`
+	ParentName        string    `json:"parent_name"`
+	Email             string    `json:"email"`
+	PhoneNumber       string    `json:"phone_number"`
+	ParentPhoneNumber string    `json:"parent_phone_number"`
+	SchoolAddress     string    `json:"school_address"`
+	Address           string    `json:"address"`
+	CreatedAt         time.Time `json:"created_at"`
+	UpdatedAt         time.Time `json:"updated_at"`
 }
+
 type UpdateProfileUserRequest struct {
-	NamaUser        string `json:"nama_user" binding:"required"`
-	NamaOrtu        string `json:"nama_ortu" binding:"required"`
-	EmailUser       string `json:"email_user" binding:"required"`
-	NoHandphoneUser string `json:"no_hp" binding:"required"`
-	PasswordUser    string `json:"password_user" binding:"required"`
-	NoHandphoneOrtu string `json:"no_hp_ortu" binding:"required"`
-	AlamatSekolah   string `json:"alamat_sekolah" binding:"required"`
-	AlamatUser      string `json:"alamat_user" binding:"required"`
+	Name              string `json:"name" binding:"required"`
+	ParentName        string `json:"parent_name" binding:"required"`
+	Email             string `json:"email" binding:"required"`
+	PhoneNumber       string `json:"phone_number" binding:"required"`
+	Password          string `json:"password" binding:"required"`
+	ParentPhoneNumber string `json:"parent_phone_number" binding:"required"`
+	SchoolAddress     string `json:"school_address" binding:"required"`
+	Address           string `json:"address" binding:"required"`
 }
