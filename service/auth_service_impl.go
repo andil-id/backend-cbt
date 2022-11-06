@@ -44,11 +44,11 @@ func (service AuthServiceImpl) Login(ctx context.Context, user string, request w
 		if err != nil {
 			return "", e.Wrap(exception.ErrBadRequest, "Email not registered")
 		}
-		err = bcrypt.CompareHashAndPassword([]byte(user.PasswordUser), []byte(request.Password))
+		err = bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(request.Password))
 		if err != nil {
 			return "", e.Wrap(exception.ErrBadRequest, "Password wrong")
 		}
-		signedToken, err := pkg.GenereateJwtToken(user.IdUser, user.NamaUser, user.EmailUser, "user")
+		signedToken, err := pkg.GenereateJwtToken(user.Id, user.Name, user.Email, "user")
 		if err != nil {
 			return "", err
 		}
@@ -86,7 +86,7 @@ func (service AuthServiceImpl) ForgetPassword(ctx context.Context, user string, 
 		if err != nil {
 			return e.Wrap(exception.ErrBadRequest, "Email not registered")
 		}
-		err = bcrypt.CompareHashAndPassword([]byte(user.PasswordUser), []byte(request.NewPassword))
+		err = bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(request.NewPassword))
 		if err == nil {
 			return e.Wrap(exception.ErrBadRequest, "New password can't be same as the old password")
 		}
@@ -135,11 +135,11 @@ func (service AuthServiceImpl) ChangePassowrd(ctx context.Context, user string, 
 		if err != nil {
 			return err
 		}
-		err = bcrypt.CompareHashAndPassword([]byte(user.PasswordUser), []byte(request.OldPassword))
+		err = bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(request.OldPassword))
 		if err != nil {
 			return e.Wrap(exception.ErrBadRequest, "Wrong old password")
 		}
-		err = bcrypt.CompareHashAndPassword([]byte(user.PasswordUser), []byte(request.NewPassword))
+		err = bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(request.NewPassword))
 		if err == nil {
 			return e.Wrap(exception.ErrBadRequest, "New password can't be same as the old password")
 		}

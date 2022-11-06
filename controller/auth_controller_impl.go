@@ -12,16 +12,16 @@ import (
 )
 
 type AuthControllerImpl struct {
-	UserService service.UserService
+	UserService  service.UserService
 	AdminService service.AdminService
-	AuthService     service.AuthService
+	AuthService  service.AuthService
 }
 
 func NewAuthController(authService service.AuthService, penggunaService service.UserService, pengurusService service.AdminService) AuthController {
 	return &AuthControllerImpl{
-		UserService: penggunaService,
+		UserService:  penggunaService,
 		AdminService: pengurusService,
-		AuthService:     authService,
+		AuthService:  authService,
 	}
 }
 
@@ -56,7 +56,7 @@ func (authController AuthControllerImpl) RegisterController(c *gin.Context) {
 			return
 		}
 
-		err = authController.UserService.RegisterUser(c.Request.Context(), auth)
+		data, err := authController.UserService.RegisterUser(c.Request.Context(), auth)
 		if err != nil {
 			c.Error(err)
 			return
@@ -65,6 +65,7 @@ func (authController AuthControllerImpl) RegisterController(c *gin.Context) {
 			"code":    http.StatusOK,
 			"status":  "OK",
 			"message": "Register user succesfully",
+			"data":    data,
 		})
 	} else if user == "admin" {
 		auth := web.RegisterAdminRequest{}
