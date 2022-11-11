@@ -4,6 +4,7 @@ import (
 	"net/http"
 
 	"github.com/andil-id/api/exception"
+	"github.com/andil-id/api/helper"
 	"github.com/andil-id/api/model/web"
 	"github.com/andil-id/api/service"
 	"github.com/gin-gonic/gin"
@@ -37,11 +38,8 @@ func (authController AuthControllerImpl) LoginController(c *gin.Context) {
 		c.Error(err)
 		return
 	} else {
-		c.JSON(http.StatusOK, gin.H{
-			"code":    http.StatusOK,
-			"status":  "succes",
-			"message": "Login succesfully",
-			"data":    token,
+		helper.ResponseSuccess(c, token, helper.Meta{
+			StatusCode: http.StatusOK,
 		})
 	}
 }
@@ -60,11 +58,8 @@ func (authController AuthControllerImpl) RegisterController(c *gin.Context) {
 			c.Error(err)
 			return
 		}
-		c.JSON(http.StatusOK, gin.H{
-			"code":    http.StatusOK,
-			"status":  "OK",
-			"message": "Register user succesfully",
-			"data":    data,
+		helper.ResponseSuccess(c, data, helper.Meta{
+			StatusCode: http.StatusOK,
 		})
 	} else if user == "admin" {
 		auth := web.RegisterAdminRequest{}
@@ -78,10 +73,8 @@ func (authController AuthControllerImpl) RegisterController(c *gin.Context) {
 			c.Error(err)
 			return
 		}
-		c.JSON(http.StatusOK, gin.H{
-			"code":    http.StatusOK,
-			"status":  "OK",
-			"message": "Register admin succesfully",
+		helper.ResponseSuccess(c, nil, helper.Meta{
+			StatusCode: http.StatusOK,
 		})
 	} else {
 		c.Error(e.Wrap(exception.ErrBadRequest, "Param not allowed"))

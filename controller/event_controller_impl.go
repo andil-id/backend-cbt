@@ -35,8 +35,5 @@ func (cl EventControllerImpl) AddEvent(c *gin.Context) {
 		StatusCode: http.StatusOK,
 		Message:    "Data was succesfully transmited!",
 	}
-	c.JSON(http.StatusOK, gin.H{
-		"data": res,
-		"meta": meta,
-	})
+	helper.ResponseSuccess(c, res, meta)
 }
