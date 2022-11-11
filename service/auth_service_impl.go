@@ -7,7 +7,6 @@ import (
 	"github.com/andil-id/api/exception"
 	"github.com/andil-id/api/helper"
 	"github.com/andil-id/api/model/web"
-	"github.com/andil-id/api/pkg"
 	"github.com/andil-id/api/repository"
 	"github.com/go-playground/validator/v10"
 	e "github.com/pkg/errors"
@@ -48,7 +47,7 @@ func (service AuthServiceImpl) Login(ctx context.Context, user string, request w
 		if err != nil {
 			return "", e.Wrap(exception.ErrBadRequest, "Password wrong")
 		}
-		signedToken, err := pkg.GenereateJwtToken(user.Id, user.Name, user.Email, "user")
+		signedToken, err := helper.GenereateJwtToken(user.Id, user.Name, user.Email, "user")
 		if err != nil {
 			return "", err
 		}
@@ -62,7 +61,7 @@ func (service AuthServiceImpl) Login(ctx context.Context, user string, request w
 		if err != nil {
 			return "", e.Wrap(exception.ErrBadRequest, "Wrong password")
 		}
-		signedToken, err := pkg.GenereateJwtToken(admin.Id, admin.Name, admin.Username, "admin")
+		signedToken, err := helper.GenereateJwtToken(admin.Id, admin.Name, admin.Username, "admin")
 		if err != nil {
 			return "", err
 		}
