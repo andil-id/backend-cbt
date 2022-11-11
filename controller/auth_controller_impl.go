@@ -7,7 +7,6 @@ import (
 	"github.com/andil-id/api/model/web"
 	"github.com/andil-id/api/service"
 	"github.com/gin-gonic/gin"
-	"github.com/golang-jwt/jwt/v4"
 	e "github.com/pkg/errors"
 )
 
@@ -86,47 +85,5 @@ func (authController AuthControllerImpl) RegisterController(c *gin.Context) {
 		})
 	} else {
 		c.Error(e.Wrap(exception.ErrBadRequest, "Param not allowed"))
-	}
-}
-func (authController AuthControllerImpl) ForgetPasswordController(c *gin.Context) {
-	user := c.Query("user")
-	auth := web.ForgetPasswordAuthRequest{}
-	err := c.ShouldBindJSON(&auth)
-	if err != nil {
-		c.Error(err)
-		return
-	}
-	err = authController.AuthService.ForgetPassword(c.Request.Context(), user, auth)
-	if err != nil {
-		c.Error(err)
-		return
-	} else {
-		c.JSON(http.StatusOK, gin.H{
-			"code":    http.StatusOK,
-			"status":  "succes",
-			"message": "Forget password succesfully",
-		})
-	}
-}
-func (authController AuthControllerImpl) ChangePasswordController(c *gin.Context) {
-	user := c.Query("user")
-	token := c.MustGet("token").(jwt.MapClaims)
-	email := token["email"].(string)
-	auth := web.ChangePasswordAuthRequest{}
-	err := c.ShouldBindJSON(&auth)
-	if err != nil {
-		c.Error(err)
-		return
-	}
-	err = authController.AuthService.ChangePassowrd(c.Request.Context(), user, email, auth)
-	if err != nil {
-		c.Error(err)
-		return
-	} else {
-		c.JSON(http.StatusOK, gin.H{
-			"code":    http.StatusOK,
-			"status":  "succes",
-			"message": "Change password succesfully",
-		})
 	}
 }

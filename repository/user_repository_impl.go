@@ -4,7 +4,6 @@ import (
 	"context"
 	"database/sql"
 	"errors"
-	"log"
 	"time"
 
 	"github.com/andil-id/api/model/domain"
@@ -39,7 +38,6 @@ func (repo *UserRepositoryImpl) GetUserById(ctx context.Context, tx *sql.Tx, id 
 func (repo *UserRepositoryImpl) SaveUser(ctx context.Context, tx *sql.Tx, user domain.Users) (string, error) {
 	SQL := "INSERT INTO users (id, name, username, phone_number, address, school_address, email, password, parent_name, parent_phone_number, created_at, updated_at) VALUES (?,?,?,?,?,?,?,?,?,?,?,?)"
 	id := ksuid.New().String()
-	log.Println("ini parent name", user.ParentName)
 	_, err := tx.ExecContext(ctx, SQL, id, user.Name, user.Username, user.PhoneNumber, user.Address, user.Address, user.Email, user.Password, user.ParentName, user.ParentPhoneNumber, time.Now(), time.Now())
 	if err != nil {
 		return "", err
@@ -82,7 +80,7 @@ func (repo *UserRepositoryImpl) FindUserByEmail(ctx context.Context, tx *sql.Tx,
 	defer rows.Close()
 	var user domain.Users
 	if rows.Next() {
-		err := rows.Scan(&user.Id, &user.Name, &user.ParentName, &user.Email, &user.PhoneNumber, &user.ParentPhoneNumber, &user.Address, &user.SchoolAddress, &user.CreatedAt, &user.UpdatedAt)
+		err := rows.Scan(&user.Id, &user.Username, &user.Name, &user.PhoneNumber, &user.Address, &user.SchoolAddress, &user.Email, &user.Password, &user.ParentName, &user.ParentPhoneNumber, &user.CreatedAt, &user.UpdatedAt)
 		if err != nil {
 			panic(err)
 		}
