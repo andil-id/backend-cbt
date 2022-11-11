@@ -12,7 +12,7 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-func NewRouter(penggunaController controller.UserController, pengurusController controller.AdminController, authController controller.AuthController) *gin.Engine {
+func NewRouter(penggunaController controller.UserController, pengurusController controller.AdminController, authController controller.AuthController, eventController controller.EventController) *gin.Engine {
 	gin.SetMode(os.Getenv("GIN_MODE"))
 	f, _ := os.Create(os.Getenv("PATH_LOG"))
 	gin.DefaultWriter = io.MultiWriter(f, os.Stdout)
@@ -44,8 +44,6 @@ func NewRouter(penggunaController controller.UserController, pengurusController 
 		{
 			auth.POST("/login", authController.LoginController)
 			auth.POST("/register", authController.RegisterController)
-			auth.POST("/forget-password", authController.ForgetPasswordController)
-			auth.PUT("/change-password", middleware.JwtAuthMiddleware(), authController.ChangePasswordController)
 		}
 		// * user
 		api.GET("/user", middleware.JwtAuthMiddleware(), penggunaController.GetUserByIdController)
@@ -57,6 +55,8 @@ func NewRouter(penggunaController controller.UserController, pengurusController 
 		api.DELETE("/admin", middleware.JwtAuthMiddleware(), pengurusController.DeleteAdminController)
 		api.PUT("/admin/profile", middleware.JwtAuthMiddleware(), pengurusController.UpdateProfileAdminController)
 		api.GET("/all/admin", middleware.JwtAuthMiddleware(), pengurusController.GetAllAdminController)
+		// * event
+		api.POST("/event/add", eventController.AddEvent)
 	}
 	return router
 }
