@@ -1,43 +1,37 @@
 package router
 
 import (
-	"fmt"
 	"io"
+	"log"
 	"os"
-	"time"
 
+	"github.com/andil-id/api/config"
 	"github.com/andil-id/api/controller"
-	"github.com/andil-id/api/exception"
 	"github.com/andil-id/api/middleware"
 	"github.com/gin-gonic/gin"
 )
 
 func NewRouter(penggunaController controller.UserController, pengurusController controller.AdminController, authController controller.AuthController, eventController controller.EventController) *gin.Engine {
-	gin.SetMode(os.Getenv("GIN_MODE"))
-	f, _ := os.Create(os.Getenv("PATH_LOG"))
+	gin.SetMode(config.GinMode)
+	f, err := os.Create(config.PathLog)
+	if err != nil {
+		log.Fatalf("Error when initialize path log %v", err)
+	}
 	gin.DefaultWriter = io.MultiWriter(f, os.Stdout)
+
 	router := gin.New()
-	router.Use(middleware.CORSMiddleware())
-	router.Use(exception.ErrorAppHandler())
-	router.Use(gin.LoggerWithFormatter(func(param gin.LogFormatterParams) string {
-		return fmt.Sprintf("%s - [%s] \"%s %s %s %d %s \"%s\" %s\"\n",
-			param.ClientIP,
-			param.TimeStamp.Format(time.RFC1123),
-			param.Method,
-			param.Path,
-			param.Request.Proto,
-			param.StatusCode,
-			param.Latency,
-			param.Request.UserAgent(),
-			param.ErrorMessage,
-		)
-	}))
 	router.Use(gin.Recovery())
+	router.Use(middleware.CORSMiddleware())
+	router.Use(middleware.ErrorAppHandler())
+	router.Use(gin.LoggerWithFormatter(middleware.Loogger))
+
 	router.GET("/", func(c *gin.Context) {
+		log.Println(c.Request.Method)
 		c.JSON(200, gin.H{
 			"message": "ok",
 		})
 	})
+
 	api := router.Group("/api")
 	{
 		auth := api.Group("/auth")
