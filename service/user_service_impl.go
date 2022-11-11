@@ -79,6 +79,30 @@ func (s *UserServiceImpl) RegisterUser(ctx context.Context, user web.RegisterUse
 		return registeredUser, e.Wrap(exception.ErrNotFound, "Email has alredy taken for other user")
 	}
 
+	byte, err := bcrypt.GenerateFromPassword([]byte(user.Password), 12)
+	if err != nil {
+		return registeredUser, err
+	}
+	createdAt := time.Now()
+	updatedAt := time.Now()
+	passwordHash := string(byte)
+	id, err := s.UserRepository.SaveUser(ctx, tx, domain.Users{
+		Name:              user.Name,
+		Username:          user.Username,
+		Email:             user.Email,
+		Password:          passwordHash,
+		PhoneNumber:       user.PhoneNumber,
+		ParentPhoneNumber: user.ParentPhoneNumber,
+		SchoolAddress:     user.SchoolAddress,
+		Address:           user.Address,
+		ParentName:        user.ParentName,
+		CreatedAt:         createdAt,
+		UpdatedAt:         updatedAt,
+	})
+	if err != nil {
+		return registeredUser, err
+	}
+
 	sliceName := strings.Split(user.Name, " ")
 	firstName := sliceName[0]
 	lastName := strings.Join(sliceName[1:], " ")
@@ -117,32 +141,13 @@ func (s *UserServiceImpl) RegisterUser(ctx context.Context, user web.RegisterUse
 	defer res.Body.Close()
 	if res.StatusCode != http.StatusOK {
 		log.Println("http statuscode --", res.StatusCode)
+		err = s.UserRepository.DeleteUser(ctx, tx, id)
+		if err != nil {
+			return registeredUser, nil
+		}
 		return registeredUser, e.Wrap(exception.ErrService, "error when create user in moodle")
 	}
 
-	bytes, err := bcrypt.GenerateFromPassword([]byte(user.Password), 12)
-	if err != nil {
-		return registeredUser, err
-	}
-	createdAt := time.Now()
-	updatedAt := time.Now()
-	passwordHash := string(bytes)
-	id, err := s.UserRepository.SaveUser(ctx, tx, domain.Users{
-		Name:              user.Name,
-		Username:          user.Username,
-		Email:             user.Email,
-		Password:          passwordHash,
-		PhoneNumber:       user.PhoneNumber,
-		ParentPhoneNumber: user.ParentPhoneNumber,
-		SchoolAddress:     user.SchoolAddress,
-		Address:           user.Address,
-		ParentName:        user.ParentName,
-		CreatedAt:         createdAt,
-		UpdatedAt:         updatedAt,
-	})
-	if err != nil {
-		return registeredUser, err
-	}
 	registeredUser = web.UserResponse{
 		Id:                id,
 		Name:              user.Name,
@@ -164,7 +169,10 @@ func (s *UserServiceImpl) DeleteUser(ctx context.Context, id string) error {
 		return err
 	}
 	defer helper.CommitOrRollback(tx)
-	s.UserRepository.DeleteUser(ctx, tx, id)
+	err = s.UserRepository.DeleteUser(ctx, tx, id)
+	if err != nil {
+		return err
+	}
 	return nil
 }
 func (s *UserServiceImpl) GetAllUser(ctx context.Context) ([]web.UserResponse, error) {
