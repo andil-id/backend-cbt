@@ -15,7 +15,7 @@ type Meta struct {
 	Message    any `json:"message,omitempty"`
 }
 
-func ResponseSuccess(c *gin.Context, data any, meta Meta, method string) {
+func ResponseSuccess(c *gin.Context, data any, meta Meta) {
 	metaData := Meta{
 		StatusCode: meta.StatusCode,
 	}
