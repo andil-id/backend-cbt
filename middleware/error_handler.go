@@ -49,7 +49,7 @@ func validationErrors(c *gin.Context, err error) bool {
 			errorMessage := fmt.Sprintf("Error in field %s, condition: %s", e.Field(), e.ActualTag())
 			errorMessages = append(errorMessages, errorMessage)
 		}
-		helper.ResponsError(c, http.StatusBadRequest, errorMessages)
+		helper.ResponseError(c, http.StatusBadRequest, errorMessages)
 		return true
 	} else {
 		return false
@@ -59,7 +59,7 @@ func validationErrors(c *gin.Context, err error) bool {
 func notFoundError(c *gin.Context, err error) bool {
 	if e.Cause(err) == exception.ErrNotFound {
 		errorMessage := strings.Split(err.Error(), ":")
-		helper.ResponsError(c, http.StatusNotFound, errorMessage[0])
+		helper.ResponseError(c, http.StatusNotFound, errorMessage[0])
 		return true
 	} else {
 		return false
@@ -69,7 +69,7 @@ func notFoundError(c *gin.Context, err error) bool {
 func badRequestError(c *gin.Context, err error) bool {
 	if e.Cause(err) == exception.ErrBadRequest {
 		errorMessage := strings.Split(err.Error(), ":")
-		helper.ResponsError(c, http.StatusBadRequest, errorMessage[0])
+		helper.ResponseError(c, http.StatusBadRequest, errorMessage[0])
 		return true
 	} else {
 		return false
@@ -79,7 +79,7 @@ func badRequestError(c *gin.Context, err error) bool {
 func serviceError(c *gin.Context, err error) bool {
 	if e.Cause(err) == exception.ErrService {
 		errorMessage := strings.Split(err.Error(), ":")
-		helper.ResponsError(c, http.StatusBadRequest, errorMessage[0])
+		helper.ResponseError(c, http.StatusBadRequest, errorMessage[0])
 		return true
 	} else {
 		return false
@@ -87,5 +87,5 @@ func serviceError(c *gin.Context, err error) bool {
 }
 
 func internalServerError(c *gin.Context, err error) {
-	helper.ResponsError(c, http.StatusBadRequest, "INTERNAL SERVER ERROR")
+	helper.ResponseError(c, http.StatusBadRequest, "INTERNAL SERVER ERROR")
 }
