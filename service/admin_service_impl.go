@@ -44,21 +44,21 @@ func (service *AdminServiceImpl) RegisterAdmin(ctx context.Context, request web.
 	}
 	defer helper.CommitOrRollback(tx)
 	// * check avaliable email
-	_, err = service.AdminRepository.FindAdminByUsername(ctx, tx, request.UsernameAdmin)
+	_, err = service.AdminRepository.FindAdminByUsername(ctx, tx, request.Username)
 	if err == nil {
 		return e.Wrap(exception.ErrNotFound, "Username has alredy taken for other user")
 	}
 	// * generate password hash
-	bytes, err := bcrypt.GenerateFromPassword([]byte(request.PasswordAdmin), 12)
+	bytes, err := bcrypt.GenerateFromPassword([]byte(request.Password), 12)
 	if err != nil {
 		return err
 	}
 	passwordHash := string(bytes)
 	// * save admin to db
-	admin := domain.Admin{
-		NamaAdmin:     request.NamaAdmin,
-		UsernameAdmin: request.UsernameAdmin,
-		PasswordAdmin: passwordHash,
+	admin := domain.Admins{
+		Name:     request.Name,
+		Username: request.Username,
+		Password: passwordHash,
 	}
 	err = service.AdminRepository.SaveAdmin(ctx, tx, admin)
 	if err != nil {
@@ -78,8 +78,8 @@ func (service *AdminServiceImpl) GetAdminById(ctx context.Context, idAdmin strin
 		return adminResponse, e.Wrap(exception.ErrNotFound, "Admin is not found")
 	}
 	adminResponse = web.GetAdminResponse{
-		IdAdmin:   admin.IdAdmin,
-		NamaAdmin: admin.NamaAdmin,
+		Id:        admin.Id,
+		Name:      admin.Name,
 		CreatedAt: admin.CreatedAt,
 		UpdatedAt: admin.UpdatedAt,
 	}
@@ -99,8 +99,8 @@ func (service *AdminServiceImpl) GetAllAdmin(ctx context.Context) ([]web.GetAdmi
 	}
 	for _, data := range admin {
 		toAdminResponse := web.GetAdminResponse{
-			IdAdmin:   data.IdAdmin,
-			NamaAdmin: data.NamaAdmin,
+			Id:        data.Id,
+			Name:      data.Name,
 			CreatedAt: data.CreatedAt,
 			UpdatedAt: data.UpdatedAt,
 		}
@@ -118,10 +118,10 @@ func (service *AdminServiceImpl) UpdateProfileAdmin(ctx context.Context, id stri
 		return err
 	}
 	defer helper.CommitOrRollback(tx)
-	err = service.AdminRepository.UpdateProfileAdmin(ctx, tx, id, domain.Admin{
-		NamaAdmin:     request.NamaAdmin,
-		UsernameAdmin: request.UsernameAdmin,
-		PasswordAdmin: request.PasswordAdmin,
+	err = service.AdminRepository.UpdateProfileAdmin(ctx, tx, id, domain.Admins{
+		Name:     request.Name,
+		Username: request.Username,
+		Password: request.Password,
 	})
 	if err != nil {
 		return err

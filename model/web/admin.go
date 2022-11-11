@@ -3,21 +3,21 @@ package web
 import "time"
 
 type RegisterAdminRequest struct {
-	NamaAdmin     string `json:"nama_admin"`
-	UsernameAdmin string `json:"username_admin"`
-	PasswordAdmin string `json:"password_admin"`
+	Name     string `json:"name"`
+	Username string `json:"username"`
+	Password string `json:"password"`
 }
 
 type GetAdminResponse struct {
-	IdAdmin       string    `json:"id_admin"`
-	NamaAdmin     string    `json:"nama_admin"`
-	UsernameAdmin string    `json:"username_admin"`
-	PasswordAdmin string    `json:"password_admin"`
-	CreatedAt     time.Time `json:"created_at"`
-	UpdatedAt     time.Time `json:"updated_at"`
+	Id        string    `json:"id"`
+	Name      string    `json:"name"`
+	Username  string    `json:"username"`
+	Password  string    `json:"password"`
+	CreatedAt time.Time `json:"created_at"`
+	UpdatedAt time.Time `json:"updated_at"`
 }
 type UpdateProfileAdminRequest struct {
-	NamaAdmin     string `json:"nama_admin"`
-	UsernameAdmin string `json:"username_admin"`
-	PasswordAdmin string `json:"password_admin"`
+	Name     string `json:"name"`
+	Username string `json:"username"`
+	Password string `json:"password"`
 }
