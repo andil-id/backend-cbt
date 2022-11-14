@@ -7,6 +7,7 @@ import (
 
 	"github.com/andil-id/api/config"
 	"github.com/andil-id/api/controller"
+	"github.com/andil-id/api/helper"
 	"github.com/andil-id/api/middleware"
 	"github.com/gin-gonic/gin"
 )
@@ -26,8 +27,8 @@ func NewRouter(penggunaController controller.UserController, pengurusController 
 	router.Use(gin.LoggerWithFormatter(middleware.Loogger))
 
 	router.GET("/", func(c *gin.Context) {
-		c.JSON(200, gin.H{
-			"message": "ok",
+		helper.ResponseSuccess(c, nil, helper.Meta{
+			StatusCode: 200,
 		})
 	})
 
