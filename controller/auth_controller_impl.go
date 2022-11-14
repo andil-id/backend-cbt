@@ -26,22 +26,42 @@ func NewAuthController(authService service.AuthService, penggunaService service.
 }
 
 func (authController AuthControllerImpl) LoginController(c *gin.Context) {
+	var res string
 	user := c.Query("user")
-	auth := web.LoginAuthRequest{}
-	err := c.ShouldBindJSON(&auth)
-	if err != nil {
-		c.Error(err)
+	switch user {
+	case "user":
+		req := web.LoginUserRequest{}
+		err := c.ShouldBindJSON(&req)
+		if err != nil {
+			c.Error(err)
+			return
+		}
+		token, err := authController.AuthService.LoginUser(c.Request.Context(), req)
+		if err != nil {
+			c.Error(err)
+			return
+		}
+		res = token
+	case "admin":
+		req := web.LoginAdminRequest{}
+		err := c.ShouldBindJSON(&req)
+		if err != nil {
+			c.Error(err)
+			return
+		}
+		token, err := authController.AuthService.LoginAdmin(c.Request.Context(), req)
+		if err != nil {
+			c.Error(err)
+			return
+		}
+		res = token
+	default:
+		c.Error(e.Wrap(exception.ErrBadRequest, "Request params not allowed!"))
 		return
 	}
-	token, err := authController.AuthService.Login(c.Request.Context(), user, auth)
-	if err != nil {
-		c.Error(err)
-		return
-	} else {
-		helper.ResponseSuccess(c, token, helper.Meta{
-			StatusCode: http.StatusOK,
-		})
-	}
+	helper.ResponseSuccess(c, res, helper.Meta{
+		StatusCode: http.StatusOK,
+	})
 }
 func (authController AuthControllerImpl) RegisterController(c *gin.Context) {
 	user := c.Query("user")
