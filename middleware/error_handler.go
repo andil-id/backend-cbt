@@ -25,6 +25,9 @@ func jsonErrorReporter(errType gin.ErrorType) gin.HandlerFunc {
 		}
 		err := detectError[0].Err
 
+		if unAuthError(c, err) {
+			return
+		}
 		if validationErrors(c, err) {
 			return
 		}
@@ -38,6 +41,15 @@ func jsonErrorReporter(errType gin.ErrorType) gin.HandlerFunc {
 			return
 		}
 		internalServerError(c, err)
+	}
+}
+
+func unAuthError(c *gin.Context, err error) bool {
+	if e.Cause(err) == exception.ErrUnAuth {
+		helper.ResponseError(c, http.StatusUnauthorized, "Your'e not authorized!")
+		return true
+	} else {
+		return false
 	}
 }
 
