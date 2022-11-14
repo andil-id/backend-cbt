@@ -28,7 +28,7 @@ func NewAuthService(DB *sql.DB, validate *validator.Validate, userRepo repositor
 		Validate:            validate,
 	}
 }
-func (service AuthServiceImpl) Login(ctx context.Context, user string, request web.LoginAuthRequest) (string, error) {
+func (service AuthServiceImpl) LoginAdmin(ctx context.Context, request web.LoginAdminRequest) (string, error) {
 	err := service.Validate.Struct(request)
 	if err != nil {
 		return "", err
@@ -38,35 +38,44 @@ func (service AuthServiceImpl) Login(ctx context.Context, user string, request w
 		return "", err
 	}
 	defer helper.CommitOrRollback(tx)
-	if user == "user" {
-		user, err := service.UserAuthRepository.FindUserByEmail(ctx, tx, request.Username)
-		if err != nil {
-			return "", e.Wrap(exception.ErrBadRequest, "Email not registered")
-		}
-		err = bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(request.Password))
-		if err != nil {
-			return "", e.Wrap(exception.ErrBadRequest, "Password wrong")
-		}
-		signedToken, err := helper.GenereateJwtToken(user.Id, user.Name, user.Email, "user")
-		if err != nil {
-			return "", err
-		}
-		return signedToken, nil
-	} else if user == "admin" {
-		admin, err := service.AdminAuthRepository.FindAdminByUsername(ctx, tx, request.Username)
-		if err != nil {
-			return "", e.Wrap(exception.ErrBadRequest, "Wrong username")
-		}
-		err = bcrypt.CompareHashAndPassword([]byte(admin.Password), []byte(request.Password))
-		if err != nil {
-			return "", e.Wrap(exception.ErrBadRequest, "Wrong password")
-		}
-		signedToken, err := helper.GenereateJwtToken(admin.Id, admin.Name, admin.Username, "admin")
-		if err != nil {
-			return "", err
-		}
-		return signedToken, nil
-	} else {
-		return "", e.Wrap(exception.ErrBadRequest, "Request param not allowed")
+
+	admin, err := service.AdminAuthRepository.FindAdminByUsername(ctx, tx, request.Username)
+	if err != nil {
+		return "", e.Wrap(exception.ErrBadRequest, "Wrong username")
 	}
+	err = bcrypt.CompareHashAndPassword([]byte(admin.Password), []byte(request.Password))
+	if err != nil {
+		return "", e.Wrap(exception.ErrBadRequest, "Wrong password")
+	}
+	signedToken, err := helper.GenereateJwtToken(admin.Id, admin.Name, "admin")
+	if err != nil {
+		return "", err
+	}
+	return signedToken, nil
+}
+
+func (service AuthServiceImpl) LoginUser(ctx context.Context, request web.LoginUserRequest) (string, error) {
+	err := service.Validate.Struct(request)
+	if err != nil {
+		return "", err
+	}
+	tx, err := service.DB.Begin()
+	if err != nil {
+		return "", err
+	}
+	defer helper.CommitOrRollback(tx)
+
+	user, err := service.UserAuthRepository.FindUserByEmail(ctx, tx, request.Email)
+	if err != nil {
+		return "", e.Wrap(exception.ErrBadRequest, "Email not registered")
+	}
+	err = bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(request.Password))
+	if err != nil {
+		return "", e.Wrap(exception.ErrBadRequest, "Password wrong")
+	}
+	signedToken, err := helper.GenereateJwtToken(user.Id, user.Name, "user")
+	if err != nil {
+		return "", err
+	}
+	return signedToken, nil
 }

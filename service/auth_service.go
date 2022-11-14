@@ -7,5 +7,6 @@ import (
 )
 
 type AuthService interface {
-	Login(ctx context.Context, user string, request web.LoginAuthRequest) (string, error)
+	LoginUser(ctx context.Context, request web.LoginUserRequest) (string, error)
+	LoginAdmin(ctx context.Context, request web.LoginAdminRequest) (string, error)
 }
