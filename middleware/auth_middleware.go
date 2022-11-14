@@ -22,7 +22,7 @@ func JwtAuthMiddleware() gin.HandlerFunc {
 		tokenString := strings.Replace(authorizationToken, "Bearer ", "", -1)
 
 		// * check signing method in token
-		token, err := jwt.Parse(tokenString, func(token *jwt.Token) (any, error) {
+		token, err := jwt.Parse(tokenString, func(token *jwt.Token) (interface{}, error) {
 			if method, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
 				return nil, fmt.Errorf("signing method invalid")
 			} else if method != jwt.SigningMethodHS256 {
@@ -32,7 +32,7 @@ func JwtAuthMiddleware() gin.HandlerFunc {
 			return []byte(jwt_secret), nil
 		})
 		if err != nil {
-			helper.ResponseError(c, http.StatusUnauthorized, "Token is invalid")
+			helper.ResponseError(c, http.StatusUnauthorized, "Token is invalid 1")
 			return
 		}
 
