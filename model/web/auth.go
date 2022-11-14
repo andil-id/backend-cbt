@@ -1,7 +1,11 @@
 package web
 
-type LoginAuthRequest struct {
-	Username string `json:"username" binding:"required,email"`
+type LoginUserRequest struct {
+	Email    string `json:"email" binding:"required,email"`
+	Password string `json:"password" binding:"required"`
+}
+type LoginAdminRequest struct {
+	Username string `json:"username" binding:"required"`
 	Password string `json:"password" binding:"required"`
 }
 type ChangePasswordAuthRequest struct {
