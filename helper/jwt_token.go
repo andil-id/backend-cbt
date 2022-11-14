@@ -8,10 +8,11 @@ import (
 	"github.com/golang-jwt/jwt/v4"
 )
 
-func GenereateJwtToken(id string, name string, email string, role string) (string, error) {
+func GenereateJwtToken(id string, name string, role string) (string, error) {
 	claims := web.Claims{
 		Id:   id,
 		Name: name,
+		Role: role,
 		RegisteredClaims: jwt.RegisteredClaims{
 			Issuer:    "BimantaraDev",
 			ExpiresAt: jwt.NewNumericDate(time.Now().Add(time.Hour * 168)),
