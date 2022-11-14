@@ -2,9 +2,26 @@ package config
 
 import "os"
 
-var GinMode = os.Getenv("GIN_MODE")
-var PathLog = os.Getenv("PATH_LOG")
-var CloudinaryCloudName = os.Getenv("CLOUDINARY_CLOUD_NAME")
-var CloudinaryApiKey = os.Getenv("CLOUDINARY_API_KEY")
-var CloudinaryApiSecreet = os.Getenv("CLOUDINARY_API_SECRET")
-var CloudinaryUploadFolder = os.Getenv("CLOUDINARY_UPLOAD_FOLDER")
+func PathLog() string {
+	return os.Getenv("PATH_LOG")
+}
+
+func GinMode() string {
+	return os.Getenv("GIN_MODE")
+}
+
+func CloudinaryCloudName() string {
+	return os.Getenv("CLOUDINARY_CLOUD_NAME")
+}
+
+func CloudinaryApiKey() string {
+	return os.Getenv("CLOUDINARY_API_KEY")
+}
+
+func CloudinaryApiSecret() string {
+	return os.Getenv("CLOUDINARY_API_SECRET")
+}
+
+func CloudinaryUploadFolder() string {
+	return os.Getenv("CLOUDINARY_UPLOAD_FOLDER")
+}
