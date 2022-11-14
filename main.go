@@ -17,7 +17,7 @@ import (
 func main() {
 	db := config.Connection()
 	validate := validator.New()
-	cld, err := cloudinary.NewFromParams(config.CloudinaryCloudName, config.CloudinaryApiKey, config.CloudinaryApiSecreet)
+	cld, err := cloudinary.NewFromParams(config.CloudinaryCloudName(), config.CloudinaryApiKey(), config.CloudinaryApiSecret())
 	if err != nil {
 		log.Fatalf("Error when create cloudinary instance, %v", err)
 	}
