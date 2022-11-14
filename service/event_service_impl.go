@@ -3,15 +3,16 @@ package service
 import (
 	"context"
 	"database/sql"
-	"log"
 	"time"
 
+	"github.com/andil-id/api/exception"
 	"github.com/andil-id/api/helper"
 	"github.com/andil-id/api/model/domain"
 	"github.com/andil-id/api/model/web"
 	"github.com/andil-id/api/repository"
 	"github.com/cloudinary/cloudinary-go/v2"
 	"github.com/go-playground/validator/v10"
+	e "github.com/pkg/errors"
 )
 
 type EventServiceImpl struct {
@@ -44,17 +45,14 @@ func (s *EventServiceImpl) CreateEvent(ctx context.Context, data web.CreateEvent
 	}
 	defer helper.CommitOrRollback(tx)
 
-	log.Println("jalan pertama")
 	image, err := data.Banner.Open()
 	if err != nil {
 		return res, err
 	}
-	log.Println("jalan kedua")
 	path, err := helper.ImageUploader(ctx, s.Cld, image, "banner")
 	if err != nil {
 		return res, err
 	}
-	log.Println("jalan ketiga")
 
 	event := domain.Events{
 		Title:       data.Title,
@@ -79,6 +77,47 @@ func (s *EventServiceImpl) CreateEvent(ctx context.Context, data web.CreateEvent
 		EndAt:       data.EndAt,
 		CreatedAt:   now,
 		UpdatedAt:   now,
+	}
+	return res, nil
+}
+
+func (s *EventServiceImpl) GetAllEvents(ctx context.Context) ([]web.Event, error) {
+	var res []web.Event
+	events, err := s.EventRepository.GetAllEvents(ctx, s.DB)
+	if err != nil {
+		return res, err
+	}
+
+	for _, event := range events {
+		res = append(res, web.Event{
+			Id:          event.Id,
+			Title:       event.Title,
+			Description: event.Description,
+			Banner:      event.Banner,
+			StartAt:     event.StartAt,
+			EndAt:       event.EndAt,
+			CreatedAt:   event.CreatedAt,
+			UpdatedAt:   event.UpdatedAt,
+		})
+	}
+	return res, nil
+}
+
+func (s *EventServiceImpl) GetEventById(ctx context.Context, id string) (web.Event, error) {
+	var res web.Event
+	event, err := s.EventRepository.GetEventById(ctx, s.DB, id)
+	if err != nil {
+		return res, e.Wrap(exception.ErrNotFound, err.Error())
+	}
+	res = web.Event{
+		Id:          event.Id,
+		Title:       event.Title,
+		Description: event.Description,
+		Banner:      event.Banner,
+		StartAt:     event.StartAt,
+		EndAt:       event.EndAt,
+		CreatedAt:   event.CreatedAt,
+		UpdatedAt:   event.UpdatedAt,
 	}
 	return res, nil
 }
