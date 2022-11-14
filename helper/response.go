@@ -16,27 +16,27 @@ type Meta struct {
 }
 
 func ResponseSuccess(c *gin.Context, data any, meta Meta) {
-	metaData := Meta{
-		StatusCode: meta.StatusCode,
-	}
-
+	metaData := Meta{}
 	switch c.Request.Method {
 	case "GET":
 		metaData = Meta{
-			Page:      meta.Page,
-			PerPage:   meta.PerPage,
-			TotalPage: meta.TotalPage,
-			TotalData: meta.TotalData,
-			Message:   "Data was successfully retrieved!",
+			Page:       meta.Page,
+			PerPage:    meta.PerPage,
+			TotalPage:  meta.TotalPage,
+			TotalData:  meta.TotalData,
+			StatusCode: meta.StatusCode,
+			Message:    "Data was successfully retrieved!",
 		}
 
 	case "DELETE":
 		metaData = Meta{
-			Message: "Data was successfully deleted!",
+			StatusCode: meta.StatusCode,
+			Message:    "Data was successfully deleted!",
 		}
 	case "POST", "PUT", "PATCH":
 		metaData = Meta{
-			Message: "Data was sunccesfully transmited!",
+			StatusCode: meta.StatusCode,
+			Message:    "Data was sunccesfully transmited!",
 		}
 	default:
 		err := errors.New("htpp method not recognized")
@@ -46,7 +46,6 @@ func ResponseSuccess(c *gin.Context, data any, meta Meta) {
 		"data": data,
 		"meta": metaData,
 	})
-
 }
 
 func ResponseError(c *gin.Context, code int, message any) {
