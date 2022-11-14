@@ -12,8 +12,8 @@ import (
 )
 
 func NewRouter(penggunaController controller.UserController, pengurusController controller.AdminController, authController controller.AuthController, eventController controller.EventController) *gin.Engine {
-	gin.SetMode(config.GinMode)
-	f, err := os.Create(config.PathLog)
+	gin.SetMode(config.GinMode())
+	f, err := os.Create(config.PathLog())
 	if err != nil {
 		log.Fatalf("Error when initialize path log %v", err)
 	}
@@ -26,7 +26,6 @@ func NewRouter(penggunaController controller.UserController, pengurusController 
 	router.Use(gin.LoggerWithFormatter(middleware.Loogger))
 
 	router.GET("/", func(c *gin.Context) {
-		log.Println(c.Request.Method)
 		c.JSON(200, gin.H{
 			"message": "ok",
 		})
@@ -40,17 +39,19 @@ func NewRouter(penggunaController controller.UserController, pengurusController 
 			auth.POST("/register", authController.RegisterController)
 		}
 		// * user
-		api.GET("/user", middleware.JwtAuthMiddleware(), penggunaController.GetUserByIdController)
-		api.DELETE("/user", middleware.JwtAuthMiddleware(), penggunaController.DeleteUserController)
-		api.PUT("/user/profile", middleware.JwtAuthMiddleware(), penggunaController.UpdateProfileUserController)
-		api.GET("/all/user", middleware.JwtAuthMiddleware(), penggunaController.GetAllUserController)
+		api.GET("/users", middleware.JwtAuthMiddleware(), penggunaController.GetAllUserController)
+		api.GET("/users/:id", middleware.JwtAuthMiddleware(), penggunaController.GetUserByIdController)
+		api.DELETE("/users/:id", middleware.JwtAuthMiddleware(), penggunaController.DeleteUserController)
+		api.PUT("/users/profile", middleware.JwtAuthMiddleware(), penggunaController.UpdateProfileUserController)
 		// * admin
-		api.GET("/admin", middleware.JwtAuthMiddleware(), pengurusController.GetAdminByIdController)
-		api.DELETE("/admin", middleware.JwtAuthMiddleware(), pengurusController.DeleteAdminController)
-		api.PUT("/admin/profile", middleware.JwtAuthMiddleware(), pengurusController.UpdateProfileAdminController)
-		api.GET("/all/admin", middleware.JwtAuthMiddleware(), pengurusController.GetAllAdminController)
+		api.GET("/admins", middleware.JwtAuthMiddleware(), pengurusController.GetAllAdminController)
+		api.GET("/admins/:id", middleware.JwtAuthMiddleware(), pengurusController.GetAdminByIdController)
+		api.DELETE("/admins/:id", middleware.JwtAuthMiddleware(), pengurusController.DeleteAdminController)
+		api.PUT("/admins/profile", middleware.JwtAuthMiddleware(), pengurusController.UpdateProfileAdminController)
 		// * event
-		api.POST("/event/add", eventController.AddEvent)
+		api.POST("/events", middleware.JwtAuthMiddleware(), eventController.AddEvent)
+		api.GET("/events", middleware.JwtAuthMiddleware(), eventController.GetAllEvents)
+		api.GET("/events/:id", middleware.JwtAuthMiddleware(), eventController.GetEventById)
 	}
 	return router
 }
