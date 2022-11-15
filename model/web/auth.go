@@ -8,6 +8,10 @@ type LoginAdminRequest struct {
 	Username string `json:"username" binding:"required"`
 	Password string `json:"password" binding:"required"`
 }
+type LoginResponse struct {
+	Token string `json:"token"`
+}
+
 type ChangePasswordAuthRequest struct {
 	OldPassword string `json:"password_lama" binding:"required"`
 	NewPassword string `json:"password_baru" binding:"required"`

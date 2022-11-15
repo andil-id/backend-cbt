@@ -26,7 +26,7 @@ func NewAuthController(authService service.AuthService, penggunaService service.
 }
 
 func (authController AuthControllerImpl) LoginController(c *gin.Context) {
-	var res string
+	var res web.LoginResponse
 	user := c.Query("user")
 	switch user {
 	case "user":
@@ -41,7 +41,7 @@ func (authController AuthControllerImpl) LoginController(c *gin.Context) {
 			c.Error(err)
 			return
 		}
-		res = token
+		res.Token = token
 	case "admin":
 		req := web.LoginAdminRequest{}
 		err := c.ShouldBindJSON(&req)
@@ -54,7 +54,7 @@ func (authController AuthControllerImpl) LoginController(c *gin.Context) {
 			c.Error(err)
 			return
 		}
-		res = token
+		res.Token = token
 	default:
 		c.Error(e.Wrap(exception.ErrBadRequest, "Request params not allowed!"))
 		return
