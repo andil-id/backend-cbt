@@ -45,11 +45,19 @@ func (s *EventServiceImpl) CreateEvent(ctx context.Context, data web.CreateEvent
 	}
 	defer helper.CommitOrRollback(tx)
 
-	image, err := data.Banner.Open()
+	banner, err := data.Banner.Open()
 	if err != nil {
 		return res, err
 	}
-	path, err := helper.ImageUploader(ctx, s.Cld, image, "banner")
+	bannerPath, err := helper.ImageUploader(ctx, s.Cld, banner, "banner")
+	if err != nil {
+		return res, err
+	}
+	certificate, err := data.Certificate.Open()
+	if err != nil {
+		return res, err
+	}
+	certificatePath, err := helper.ImageUploader(ctx, s.Cld, certificate, "certificate")
 	if err != nil {
 		return res, err
 	}
@@ -57,7 +65,8 @@ func (s *EventServiceImpl) CreateEvent(ctx context.Context, data web.CreateEvent
 	event := domain.Events{
 		Title:       data.Title,
 		Description: data.Description,
-		Banner:      path,
+		Banner:      bannerPath,
+		Certificate: certificatePath,
 		StartAt:     data.StartAt,
 		EndAt:       data.EndAt,
 		CreatedAt:   now,
@@ -72,7 +81,8 @@ func (s *EventServiceImpl) CreateEvent(ctx context.Context, data web.CreateEvent
 		Id:          id,
 		Title:       data.Title,
 		Description: data.Description,
-		Banner:      path,
+		Banner:      bannerPath,
+		Certificate: certificatePath,
 		StartAt:     data.StartAt,
 		EndAt:       data.EndAt,
 		CreatedAt:   now,
@@ -94,6 +104,7 @@ func (s *EventServiceImpl) GetAllEvents(ctx context.Context) ([]web.Event, error
 			Title:       event.Title,
 			Description: event.Description,
 			Banner:      event.Banner,
+			Certificate: event.Certificate,
 			StartAt:     event.StartAt,
 			EndAt:       event.EndAt,
 			CreatedAt:   event.CreatedAt,
@@ -114,6 +125,7 @@ func (s *EventServiceImpl) GetEventById(ctx context.Context, id string) (web.Eve
 		Title:       event.Title,
 		Description: event.Description,
 		Banner:      event.Banner,
+		Certificate: event.Certificate,
 		StartAt:     event.StartAt,
 		EndAt:       event.EndAt,
 		CreatedAt:   event.CreatedAt,

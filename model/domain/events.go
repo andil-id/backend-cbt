@@ -7,6 +7,7 @@ type Events struct {
 	Title       string
 	Description string
 	Banner      string
+	Certificate string
 	StartAt     time.Time
 	EndAt       time.Time
 	CreatedAt   time.Time
