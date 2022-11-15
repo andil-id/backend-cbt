@@ -1,9 +1,9 @@
 package helper
 
 import (
-	"os"
 	"time"
 
+	"github.com/andil-id/api/config"
 	"github.com/andil-id/api/model/web"
 	"github.com/golang-jwt/jwt/v4"
 )
@@ -20,7 +20,7 @@ func GenereateJwtToken(id string, name string, role string) (string, error) {
 	}
 
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
-	jwt_secret := os.Getenv("JWT_SECRET")
+	jwt_secret := config.JwtSecreet()
 	signedToken, err := token.SignedString([]byte(jwt_secret))
 	if err != nil {
 		return "", err

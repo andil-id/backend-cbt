@@ -2,7 +2,6 @@ package main
 
 import (
 	"log"
-	"os"
 
 	"github.com/andil-id/api/config"
 	"github.com/andil-id/api/controller"
@@ -37,5 +36,5 @@ func main() {
 	eventController := controller.NewEventController(eventService)
 
 	router := router.NewRouter(userController, adminController, authController, eventController)
-	router.Run(":" + os.Getenv("PORT"))
+	router.Run(":" + config.AppPort())
 }

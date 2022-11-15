@@ -2,14 +2,19 @@ package config
 
 import (
 	"database/sql"
-	"os"
 	"time"
 
 	_ "github.com/joho/godotenv"
 )
 
 func Connection() *sql.DB {
-	DBURL := `` + os.Getenv("DB_USER") + `:` + os.Getenv("DB_PASS") + `@tcp(` + os.Getenv("DB_HOST") + `:` + os.Getenv("DB_PORT") + `)/` + os.Getenv("DB_NAME") + `?parseTime=true`
+	host := DbHost()
+	port := DbPort()
+	name := DbName()
+	username := DbUsername()
+	password := DbPassword()
+
+	DBURL := `` + username + `:` + password + `@tcp(` + host + `:` + port + `)/` + name + `?parseTime=true`
 	db, err := sql.Open("mysql", DBURL)
 	if err != nil {
 		panic(err.Error())

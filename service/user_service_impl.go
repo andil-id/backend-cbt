@@ -8,10 +8,10 @@ import (
 	"fmt"
 	"log"
 	"net/http"
-	"os"
 	"strings"
 	"time"
 
+	"github.com/andil-id/api/config"
 	"github.com/andil-id/api/exception"
 	"github.com/andil-id/api/helper"
 	"github.com/andil-id/api/model/domain"
@@ -122,8 +122,8 @@ func (s *UserServiceImpl) RegisterUser(ctx context.Context, user web.RegisterUse
 		return registeredUser, err
 	}
 
-	baseUrl := os.Getenv("BASE_URL")
-	token := os.Getenv("MOODLE_TOKEN")
+	baseUrl := config.MoodleBaseUrl()
+	token := config.MoodleToken()
 	client := &http.Client{}
 	r, err := http.NewRequestWithContext(ctx, http.MethodPost, fmt.Sprintf("%s/core_user_create_users", baseUrl), bytes.NewBuffer(jsonReq))
 	if err != nil {

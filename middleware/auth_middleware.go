@@ -3,9 +3,9 @@ package middleware
 import (
 	"fmt"
 	"net/http"
-	"os"
 	"strings"
 
+	"github.com/andil-id/api/config"
 	"github.com/andil-id/api/helper"
 	"github.com/gin-gonic/gin"
 	"github.com/golang-jwt/jwt/v4"
@@ -28,7 +28,7 @@ func JwtAuthMiddleware() gin.HandlerFunc {
 			} else if method != jwt.SigningMethodHS256 {
 				return nil, fmt.Errorf("signing method invalid")
 			}
-			jwt_secret := os.Getenv("JWT_SECRET")
+			jwt_secret := config.JwtSecreet()
 			return []byte(jwt_secret), nil
 		})
 		if err != nil {
