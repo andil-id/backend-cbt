@@ -45,7 +45,7 @@ jobs:
           port: ${{ secrets.SSH_PORT }}
           script: |
             cp /home/$USER/app/backend-dev/bin/bin/main /home/$USER/app/backend-dev/bin/main
-            chmod +x /home/andil/app/backend-dev/bin/main
+            chmod +x /home/$USER/app/backend-dev/bin/main
             rm -rf /home/$USER/app/backend-dev/bin/bin
       - name: Deploy
         uses: appleboy/ssh-action@master
