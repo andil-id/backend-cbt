@@ -3,6 +3,8 @@ package service
 import (
 	"context"
 	"database/sql"
+	"path/filepath"
+	"strings"
 	"time"
 
 	"github.com/andil-id/api/exception"
@@ -13,6 +15,7 @@ import (
 	"github.com/cloudinary/cloudinary-go/v2"
 	"github.com/go-playground/validator/v10"
 	e "github.com/pkg/errors"
+	"golang.org/x/exp/slices"
 )
 
 type EventServiceImpl struct {
@@ -34,9 +37,21 @@ func NewEventService(db *sql.DB, validate *validator.Validate, eventRepository r
 func (s *EventServiceImpl) CreateEvent(ctx context.Context, data web.CreateEventRequest) (web.Event, error) {
 	now := time.Now()
 	res := web.Event{}
+	aceptedFiles := []string{"JPG", "PNG", "WEBP", "HEIF"}
+	bannerExt := strings.ToUpper(strings.TrimLeft(filepath.Ext(data.Banner.Filename), "."))
+	certificateExt := strings.ToUpper(strings.TrimLeft(filepath.Ext(data.Certificate.Filename), "."))
+
 	err := s.Validate.Struct(data)
 	if err != nil {
 		return res, err
+	}
+
+	// * checking file type and file size
+	if !slices.Contains(aceptedFiles, certificateExt) || !slices.Contains(aceptedFiles, bannerExt) {
+		return res, e.Wrapf(exception.ErrBadRequest, "format file is not suported: file must be %s format", strings.Join(aceptedFiles, ", "))
+	}
+	if data.Certificate.Size > 5242880 || data.Banner.Size > 5242880 {
+		return res, e.Wrap(exception.ErrBadRequest, "file is to large: maximum file size is 5 mb")
 	}
 
 	tx, err := s.DB.Begin()
