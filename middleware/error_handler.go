@@ -3,7 +3,6 @@ package middleware
 import (
 	"fmt"
 	"net/http"
-	"strings"
 
 	"github.com/andil-id/api/exception"
 	"github.com/andil-id/api/helper"
@@ -70,8 +69,8 @@ func validationErrors(c *gin.Context, err error) bool {
 
 func notFoundError(c *gin.Context, err error) bool {
 	if e.Cause(err) == exception.ErrNotFound {
-		errorMessage := strings.Split(err.Error(), ":")
-		helper.ResponseError(c, http.StatusNotFound, errorMessage[0])
+		errorMessage := helper.ErrMsgFormat(err.Error())
+		helper.ResponseError(c, http.StatusNotFound, errorMessage)
 		return true
 	} else {
 		return false
@@ -80,8 +79,8 @@ func notFoundError(c *gin.Context, err error) bool {
 
 func badRequestError(c *gin.Context, err error) bool {
 	if e.Cause(err) == exception.ErrBadRequest {
-		errorMessage := strings.Split(err.Error(), ":")
-		helper.ResponseError(c, http.StatusBadRequest, errorMessage[0])
+		errorMessage := helper.ErrMsgFormat(err.Error())
+		helper.ResponseError(c, http.StatusBadRequest, errorMessage)
 		return true
 	} else {
 		return false
@@ -90,8 +89,8 @@ func badRequestError(c *gin.Context, err error) bool {
 
 func serviceError(c *gin.Context, err error) bool {
 	if e.Cause(err) == exception.ErrService {
-		errorMessage := strings.Split(err.Error(), ":")
-		helper.ResponseError(c, http.StatusBadRequest, errorMessage[0])
+		errorMessage := helper.ErrMsgFormat(err.Error())
+		helper.ResponseError(c, http.StatusBadRequest, errorMessage)
 		return true
 	} else {
 		return false
