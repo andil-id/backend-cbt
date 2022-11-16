@@ -140,6 +140,12 @@ func (s *UserServiceImpl) RegisterUser(ctx context.Context, user web.RegisterUse
 	}
 	defer res.Body.Close()
 	if res.StatusCode != http.StatusOK {
+		var failureResponse interface{}
+		err := json.NewDecoder(res.Body).Decode(&failureResponse)
+		if err != nil {
+			return registeredUser, err
+		}
+		log.Println(failureResponse)
 		log.Println("http statuscode --", res.StatusCode)
 		err = s.UserRepository.DeleteUser(ctx, tx, id)
 		if err != nil {
