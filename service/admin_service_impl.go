@@ -3,6 +3,7 @@ package service
 import (
 	"context"
 	"database/sql"
+	"time"
 
 	"github.com/andil-id/api/exception"
 	"github.com/andil-id/api/helper"
@@ -31,40 +32,53 @@ func NewAdminService(adminRepository repository.AdminRepository, db *sql.DB, val
 	}
 }
 
-func (service *AdminServiceImpl) RegisterAdmin(ctx context.Context, request web.RegisterAdminRequest) error {
+func (service *AdminServiceImpl) RegisterAdmin(ctx context.Context, request web.RegisterAdminRequest) (web.Admin, error) {
+	var registeredAdmin web.Admin
+
 	// * validate request body
 	err := service.Validate.Struct(request)
 	if err != nil {
-		return err
+		return registeredAdmin, err
 	}
 	// * rolback db transaction when error
 	tx, err := service.DB.Begin()
 	if err != nil {
-		return err
+		return registeredAdmin, err
 	}
 	defer helper.CommitOrRollback(tx)
 	// * check avaliable email
 	_, err = service.AdminRepository.FindAdminByUsername(ctx, tx, request.Username)
 	if err == nil {
-		return e.Wrap(exception.ErrNotFound, "Username has alredy taken for other user")
+		return registeredAdmin, e.Wrap(exception.ErrNotFound, "Username has alredy taken for other user")
 	}
 	// * generate password hash
 	bytes, err := bcrypt.GenerateFromPassword([]byte(request.Password), 12)
 	if err != nil {
-		return err
+		return registeredAdmin, err
 	}
 	passwordHash := string(bytes)
+	now := time.Now()
 	// * save admin to db
 	admin := domain.Admins{
-		Name:     request.Name,
-		Username: request.Username,
-		Password: passwordHash,
+		Name:      request.Name,
+		Username:  request.Username,
+		Password:  passwordHash,
+		CreatedAt: now,
+		UpdatedAt: now,
 	}
-	err = service.AdminRepository.SaveAdmin(ctx, tx, admin)
+	id, err := service.AdminRepository.SaveAdmin(ctx, tx, admin)
 	if err != nil {
-		return err
+		return registeredAdmin, err
 	}
-	return nil
+
+	registeredAdmin = web.Admin{
+		Id:        id,
+		Username:  request.Username,
+		Name:      request.Name,
+		CreatedAt: now,
+		UpdatedAt: now,
+	}
+	return registeredAdmin, nil
 }
 func (service *AdminServiceImpl) GetAdminById(ctx context.Context, idAdmin string) (web.GetAdminResponse, error) {
 	var adminResponse web.GetAdminResponse

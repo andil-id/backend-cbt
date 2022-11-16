@@ -56,7 +56,7 @@ func (authController AuthControllerImpl) LoginController(c *gin.Context) {
 		}
 		res.Token = token
 	default:
-		c.Error(e.Wrap(exception.ErrBadRequest, "Request params not allowed!"))
+		c.Error(e.Wrap(exception.ErrBadRequest, "request params not allowed!"))
 		return
 	}
 	helper.ResponseSuccess(c, res, helper.Meta{
@@ -88,15 +88,15 @@ func (authController AuthControllerImpl) RegisterController(c *gin.Context) {
 			c.Error(err)
 			return
 		}
-		err = authController.AdminService.RegisterAdmin(c.Request.Context(), auth)
+		res, err := authController.AdminService.RegisterAdmin(c.Request.Context(), auth)
 		if err != nil {
 			c.Error(err)
 			return
 		}
-		helper.ResponseSuccess(c, nil, helper.Meta{
+		helper.ResponseSuccess(c, res, helper.Meta{
 			StatusCode: http.StatusOK,
 		})
 	} else {
-		c.Error(e.Wrap(exception.ErrBadRequest, "Param not allowed"))
+		c.Error(e.Wrap(exception.ErrBadRequest, "request param not allowed"))
 	}
 }

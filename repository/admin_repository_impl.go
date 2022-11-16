@@ -34,14 +34,14 @@ func (repository *AdminRepositoryImpl) GetAdminById(ctx context.Context, tx *sql
 		return admin, errors.New("data not found")
 	}
 }
-func (repository *AdminRepositoryImpl) SaveAdmin(ctx context.Context, tx *sql.Tx, admin domain.Admins) error {
+func (repository *AdminRepositoryImpl) SaveAdmin(ctx context.Context, tx *sql.Tx, admin domain.Admins) (string, error) {
 	SQL := "INSERT INTO admins (id, name, username, password, created_at, updated_at) VALUES (?,?,?,?,?,?)"
 	id := ksuid.New().String()
 	_, err := tx.ExecContext(ctx, SQL, id, admin.Name, admin.Username, admin.Password, time.Now(), time.Now())
 	if err != nil {
-		return err
+		return "", err
 	}
-	return nil
+	return id, nil
 }
 func (repository *AdminRepositoryImpl) DeleteAdmin(ctx context.Context, tx *sql.Tx, id string) error {
 	SQL := "DELETE FROM admins WHERE id = ?"
