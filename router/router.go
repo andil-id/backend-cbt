@@ -51,8 +51,8 @@ func NewRouter(penggunaController controller.UserController, pengurusController 
 		api.PUT("/admins/profile", middleware.JwtAuthMiddleware(), pengurusController.UpdateProfileAdminController)
 		// * event
 		api.POST("/events", middleware.JwtAuthMiddleware(), eventController.AddEvent)
-		api.GET("/events", middleware.JwtAuthMiddleware(), eventController.GetAllEvents)
-		api.GET("/events/:id", middleware.JwtAuthMiddleware(), eventController.GetEventById)
+		api.GET("/events", eventController.GetAllEvents)
+		api.GET("/events/:id", eventController.GetEventById)
 	}
 	return router
 }
