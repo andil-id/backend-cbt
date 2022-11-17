@@ -98,5 +98,5 @@ func serviceError(c *gin.Context, err error) bool {
 }
 
 func internalServerError(c *gin.Context, err error) {
-	helper.ResponseError(c, http.StatusBadRequest, "INTERNAL SERVER ERROR")
+	helper.ResponseError(c, http.StatusInternalServerError, "INTERNAL SERVER ERROR")
 }
