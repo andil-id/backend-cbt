@@ -37,7 +37,7 @@ func NewEventService(db *sql.DB, validate *validator.Validate, eventRepository r
 func (s *EventServiceImpl) CreateEvent(ctx context.Context, data web.CreateEventRequest) (web.Event, error) {
 	now := time.Now()
 	res := web.Event{}
-	aceptedFiles := []string{"JPG", "PNG", "WEBP", "HEIF"}
+	aceptedFiles := []string{"JPG", "JPEG", "PNG", "WEBP", "HEIF"}
 	bannerExt := strings.ToUpper(strings.TrimLeft(filepath.Ext(data.Banner.Filename), "."))
 	certificateExt := strings.ToUpper(strings.TrimLeft(filepath.Ext(data.Certificate.Filename), "."))
 
@@ -78,14 +78,17 @@ func (s *EventServiceImpl) CreateEvent(ctx context.Context, data web.CreateEvent
 	}
 
 	event := domain.Events{
-		Title:       data.Title,
-		Description: data.Description,
-		Banner:      bannerPath,
-		Certificate: certificatePath,
-		StartAt:     data.StartAt,
-		EndAt:       data.EndAt,
-		CreatedAt:   now,
-		UpdatedAt:   now,
+		Title:          data.Title,
+		Description:    data.Description,
+		Banner:         bannerPath,
+		Certificate:    certificatePath,
+		Price:          data.Price,
+		Type:           data.Type,
+		BankAccountNum: data.BankAccountNum,
+		StartAt:        data.StartAt,
+		EndAt:          data.EndAt,
+		CreatedAt:      now,
+		UpdatedAt:      now,
 	}
 	id, err := s.EventRepository.SaveEvent(ctx, tx, event)
 	if err != nil {
@@ -93,15 +96,18 @@ func (s *EventServiceImpl) CreateEvent(ctx context.Context, data web.CreateEvent
 	}
 
 	res = web.Event{
-		Id:          id,
-		Title:       data.Title,
-		Description: data.Description,
-		Banner:      bannerPath,
-		Certificate: certificatePath,
-		StartAt:     data.StartAt,
-		EndAt:       data.EndAt,
-		CreatedAt:   now,
-		UpdatedAt:   now,
+		Id:             id,
+		Title:          data.Title,
+		Description:    data.Description,
+		Banner:         bannerPath,
+		Certificate:    certificatePath,
+		Price:          data.Price,
+		Type:           data.Type,
+		BankAccountNum: data.BankAccountNum,
+		StartAt:        data.StartAt,
+		EndAt:          data.EndAt,
+		CreatedAt:      now,
+		UpdatedAt:      now,
 	}
 	return res, nil
 }
@@ -115,15 +121,18 @@ func (s *EventServiceImpl) GetAllEvents(ctx context.Context) ([]web.Event, error
 
 	for _, event := range events {
 		res = append(res, web.Event{
-			Id:          event.Id,
-			Title:       event.Title,
-			Description: event.Description,
-			Banner:      event.Banner,
-			Certificate: event.Certificate,
-			StartAt:     event.StartAt,
-			EndAt:       event.EndAt,
-			CreatedAt:   event.CreatedAt,
-			UpdatedAt:   event.UpdatedAt,
+			Id:             event.Id,
+			Title:          event.Title,
+			Description:    event.Description,
+			Banner:         event.Banner,
+			Certificate:    event.Certificate,
+			Price:          event.Price,
+			Type:           event.Type,
+			BankAccountNum: event.BankAccountNum,
+			StartAt:        event.StartAt,
+			EndAt:          event.EndAt,
+			CreatedAt:      event.CreatedAt,
+			UpdatedAt:      event.UpdatedAt,
 		})
 	}
 	return res, nil
@@ -136,15 +145,18 @@ func (s *EventServiceImpl) GetEventById(ctx context.Context, id string) (web.Eve
 		return res, e.Wrap(exception.ErrNotFound, err.Error())
 	}
 	res = web.Event{
-		Id:          event.Id,
-		Title:       event.Title,
-		Description: event.Description,
-		Banner:      event.Banner,
-		Certificate: event.Certificate,
-		StartAt:     event.StartAt,
-		EndAt:       event.EndAt,
-		CreatedAt:   event.CreatedAt,
-		UpdatedAt:   event.UpdatedAt,
+		Id:             event.Id,
+		Title:          event.Title,
+		Description:    event.Description,
+		Banner:         event.Banner,
+		Certificate:    event.Certificate,
+		Price:          event.Price,
+		Type:           event.Type,
+		BankAccountNum: event.BankAccountNum,
+		StartAt:        event.StartAt,
+		EndAt:          event.EndAt,
+		CreatedAt:      event.CreatedAt,
+		UpdatedAt:      event.UpdatedAt,
 	}
 	return res, nil
 }
