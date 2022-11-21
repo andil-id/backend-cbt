@@ -14,6 +14,7 @@ type Event struct {
 	Price          int       `json:"price,omitempty"`
 	Type           string    `json:"type,omitempty"`
 	BankAccountNum string    `json:"bank_account_number,omitempty"`
+	Location       string    `json:"location,omitempty"`
 	StartAt        time.Time `json:"start_at,omitempty"`
 	EndAt          time.Time `json:"end_at,omitempty"`
 	CreatedAt      time.Time `json:"created_at,omitempty"`
@@ -28,6 +29,7 @@ type CreateEventRequest struct {
 	Price          int                   `form:"price"`
 	Type           string                `form:"type" binding:"required"`
 	BankAccountNum string                `form:"bank_account_number" binding:"required"`
+	Location       string                `form:"location" binding:"required"`
 	StartAt        time.Time             `form:"start_at" binding:"required"`
 	EndAt          time.Time             `form:"end_at" binding:"required"`
 }

@@ -12,7 +12,7 @@ type RegisterUserRequest struct {
 	Password          string `json:"password" binding:"required"`
 	PhoneNumber       string `json:"phone_number" binding:"required"`
 	ParentPhoneNumber string `json:"parent_phone_number" binding:"required"`
-	SchoolAddress     string `json:"school_address" binding:"required"`
+	SchoolAddress     string `json:"school_name" binding:"required"`
 	Address           string `json:"address" binding:"required"`
 }
 
@@ -24,7 +24,7 @@ type UserResponse struct {
 	Email             string    `json:"email"`
 	PhoneNumber       string    `json:"phone_number"`
 	ParentPhoneNumber string    `json:"parent_phone_number"`
-	SchoolAddress     string    `json:"school_address"`
+	SchoolAddress     string    `json:"school_name"`
 	Address           string    `json:"address"`
 	CreatedAt         time.Time `json:"created_at"`
 	UpdatedAt         time.Time `json:"updated_at"`

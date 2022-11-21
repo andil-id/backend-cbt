@@ -19,8 +19,8 @@ func NewEventRepository() EventRepository {
 
 func (r *EventRepositoryImpl) SaveEvent(ctx context.Context, tx *sql.Tx, event domain.Events) (string, error) {
 	id := ksuid.New().String()
-	SQL := "INSERT INTO events (id, title, description, banner, certificate, price, type, bank_account_num, start_at, end_at, created_at, updated_at) VALUES (?,?,?,?,?,?,?,?,?,?,?,?)"
-	_, err := tx.ExecContext(ctx, SQL, id, event.Title, event.Description, event.Banner, event.Certificate, event.Price, event.Type, event.BankAccountNum, event.StartAt, event.EndAt, time.Now(), time.Now())
+	SQL := "INSERT INTO events (id, title, description, banner, certificate, price, type, bank_account_num, location, start_at, end_at, created_at, updated_at) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?)"
+	_, err := tx.ExecContext(ctx, SQL, id, event.Title, event.Description, event.Banner, event.Certificate, event.Price, event.Type, event.BankAccountNum, event.Location, event.StartAt, event.EndAt, time.Now(), time.Now())
 	if err != nil {
 		panic(err)
 	}
@@ -40,7 +40,7 @@ func (r *EventRepositoryImpl) GetAllEvents(ctx context.Context, db *sql.DB) ([]d
 	var events []domain.Events
 	for rows.Next() {
 		var event domain.Events
-		err := rows.Scan(&event.Id, &event.Title, &event.Description, &event.Banner, &event.Certificate, &event.Price, &event.Type, &event.BankAccountNum, &event.StartAt, &event.EndAt, &event.CreatedAt, &event.UpdatedAt)
+		err := rows.Scan(&event.Id, &event.Title, &event.Description, &event.Banner, &event.Certificate, &event.Price, &event.Type, &event.BankAccountNum, &event.Location, &event.StartAt, &event.EndAt, &event.CreatedAt, &event.UpdatedAt)
 		if err != nil {
 			panic(err)
 		}
@@ -57,7 +57,7 @@ func (r *EventRepositoryImpl) GetEventById(ctx context.Context, db *sql.DB, id s
 	}
 	var event domain.Events
 	if rows.Next() {
-		err := rows.Scan(&event.Id, &event.Title, &event.Description, &event.Banner, &event.Certificate, &event.Price, &event.Type, &event.BankAccountNum, &event.StartAt, &event.EndAt, &event.CreatedAt, &event.UpdatedAt)
+		err := rows.Scan(&event.Id, &event.Title, &event.Description, &event.Banner, &event.Certificate, &event.Price, &event.Type, &event.BankAccountNum, &event.Location, &event.StartAt, &event.EndAt, &event.CreatedAt, &event.UpdatedAt)
 		if err != nil {
 			panic(err)
 		}

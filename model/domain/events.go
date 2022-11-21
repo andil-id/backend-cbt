@@ -11,6 +11,7 @@ type Events struct {
 	Price          int
 	Type           string
 	BankAccountNum string
+	Location       string
 	StartAt        time.Time
 	EndAt          time.Time
 	CreatedAt      time.Time
