@@ -24,17 +24,20 @@ func main() {
 	userRepository := repository.NewUserRepository()
 	adminRepository := repository.NewAdminRepository()
 	eventRepository := repository.NewEventRepository()
+	orderRepository := repository.NewOrderRepository()
 
 	userService := service.NewUserService(userRepository, db, validate)
 	adminService := service.NewAdminService(adminRepository, db, validate, userRepository)
 	authService := service.NewAuthService(db, validate, userRepository, adminRepository)
 	eventService := service.NewEventService(db, validate, eventRepository, cld)
+	orderService := service.NewOrderService(db, validate, orderRepository, cld)
 
 	adminController := controller.NewAdminController(adminService)
 	userController := controller.NewUserController(userService)
 	authController := controller.NewAuthController(authService, userService, adminService)
 	eventController := controller.NewEventController(eventService)
+	orderController := controller.NewOrderController(orderService)
 
-	router := router.NewRouter(userController, adminController, authController, eventController)
+	router := router.NewRouter(userController, adminController, authController, eventController, orderController)
 	router.Run(":" + config.AppPort())
 }

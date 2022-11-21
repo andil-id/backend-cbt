@@ -12,7 +12,7 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-func NewRouter(penggunaController controller.UserController, pengurusController controller.AdminController, authController controller.AuthController, eventController controller.EventController) *gin.Engine {
+func NewRouter(penggunaController controller.UserController, pengurusController controller.AdminController, authController controller.AuthController, eventController controller.EventController, orderController controller.OrderController) *gin.Engine {
 	gin.SetMode(config.GinMode())
 	f, err := os.Create(config.PathLog())
 	if err != nil {
@@ -53,6 +53,10 @@ func NewRouter(penggunaController controller.UserController, pengurusController 
 		api.POST("/events", middleware.JwtAuthMiddleware(), eventController.AddEvent)
 		api.GET("/events", eventController.GetAllEvents)
 		api.GET("/events/:id", eventController.GetEventById)
+		events := api.Group("/events")
+		{
+			events.POST("/order", middleware.JwtAuthMiddleware(), orderController.CreateOrderEvent)
+		}
 	}
 	return router
 }
