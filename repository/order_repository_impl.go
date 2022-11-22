@@ -93,3 +93,12 @@ func (r *OrderRepositoryImpl) GetOrderByUserIdAndEventId(ctx context.Context, db
 	}
 	return order, errors.New("event not found")
 }
+
+func (r *OrderRepositoryImpl) UpdateOrderStatus(ctx context.Context, tx *sql.Tx, status string, id string) error {
+	SQL := "UPDATE orders SET status = ? WHERE id = ?"
+	_, err := tx.ExecContext(ctx, SQL, status, id)
+	if err != nil {
+		return err
+	}
+	return nil
+}

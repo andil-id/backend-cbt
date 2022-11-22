@@ -11,4 +11,5 @@ type OrderService interface {
 	// GetOrderById(ctx context.Context, id string) (error, web.Order)
 	CreateOrder(ctx context.Context, data web.CreateOrderRequest, userId string) (web.Order, error)
 	// GetOrderUserByEventId(ctx context.Context, userId string, eventId string) (error, web.Order)
+	UpdateOrderStatus(ctx context.Context, status string, id string) error
 }

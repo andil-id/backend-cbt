@@ -3,6 +3,7 @@ package service
 import (
 	"context"
 	"database/sql"
+	"errors"
 	"time"
 
 	"github.com/andil-id/api/helper"
@@ -27,6 +28,30 @@ func NewOrderService(db *sql.DB, validate *validator.Validate, orderRepository r
 		OrderRepository: orderRepository,
 		Cld:             cld,
 	}
+}
+
+func (s *OrderServiceImpl) UpdateOrderStatus(ctx context.Context, status string, id string) error {
+	tx, err := s.DB.Begin()
+	if err != nil {
+		return err
+	}
+	defer helper.CommitOrRollback(tx)
+
+	switch status {
+	case "confirm":
+		err := s.OrderRepository.UpdateOrderStatus(ctx, tx, "CONFIRM", id)
+		if err != nil {
+			return err
+		}
+	case "reject":
+		err := s.OrderRepository.UpdateOrderStatus(ctx, tx, "REJECT", id)
+		if err != nil {
+			return err
+		}
+	default:
+		return errors.New("set order status not allowed: only accept confirm, reject, and waiting")
+	}
+	return nil
 }
 
 func (s *OrderServiceImpl) CreateOrder(ctx context.Context, data web.CreateOrderRequest, userId string) (web.Order, error) {

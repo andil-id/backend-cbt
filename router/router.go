@@ -41,8 +41,8 @@ func NewRouter(userController controller.UserController, adminController control
 		}
 		// * user
 		api.GET("/users", middleware.JwtAuthMiddleware(), userController.GetAllUserController)
-		api.GET("/users/:id", middleware.JwtAuthMiddleware(), userController.GetUserByIdController)
 		api.DELETE("/users/:id", middleware.JwtAuthMiddleware(), userController.DeleteUserController)
+		api.GET("/users/profile", middleware.JwtAuthMiddleware(), userController.GetUserProfile)
 		api.PUT("/users/profile", middleware.JwtAuthMiddleware(), userController.UpdateProfileUserController)
 		// * admin
 		api.GET("/admins", middleware.JwtAuthMiddleware(), adminController.GetAllAdminController)
@@ -56,6 +56,8 @@ func NewRouter(userController controller.UserController, adminController control
 		events := api.Group("/events")
 		{
 			events.POST("/order", middleware.JwtAuthMiddleware(), orderController.CreateOrderEvent)
+			events.PUT("/order/confirm/:id", middleware.JwtAuthMiddleware(), orderController.ConfirmOrder)
+			events.PUT("/order/reject/:id", middleware.JwtAuthMiddleware(), orderController.RejectOrder)
 		}
 	}
 	return router
