@@ -23,7 +23,7 @@ func NewUserController(userService service.UserService) UserController {
 	}
 }
 
-func (userContoller UserControllerImpl) GetUserByIdController(c *gin.Context) {
+func (userContoller UserControllerImpl) GetUserProfile(c *gin.Context) {
 	token := c.MustGet("token").(jwt.MapClaims)
 	id := token["id"]
 
