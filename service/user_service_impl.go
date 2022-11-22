@@ -38,30 +38,27 @@ func NewUserService(repo repository.UserRepository, DB *sql.DB, validate *valida
 }
 
 func (s *UserServiceImpl) GetUserById(ctx context.Context, id string) (web.UserResponse, error) {
-	var response_pengguna web.UserResponse
-	tx, err := s.DB.Begin()
+	var res web.UserResponse
+	user, err := s.UserRepository.GetUserById(ctx, s.DB, id)
 	if err != nil {
-		panic(err)
+		return res, e.Wrap(exception.ErrNotFound, err.Error())
 	}
-	defer helper.CommitOrRollback(tx)
-	pengguna, err := s.UserRepository.GetUserById(ctx, tx, id)
-	if err != nil {
-		return response_pengguna, e.Wrap(exception.ErrNotFound, err.Error())
+	res = web.UserResponse{
+		Id:                user.Id,
+		Username:          user.Username,
+		Name:              user.Name,
+		ParentName:        user.ParentName,
+		Email:             user.Email,
+		PhoneNumber:       user.PhoneNumber,
+		ParentPhoneNumber: user.ParentPhoneNumber,
+		SchoolAddress:     user.SchoolAddress,
+		Address:           user.Address,
+		CreatedAt:         user.CreatedAt,
+		UpdatedAt:         user.UpdatedAt,
 	}
-	response_pengguna = web.UserResponse{
-		Id:                pengguna.Id,
-		Name:              pengguna.Name,
-		ParentName:        pengguna.ParentName,
-		Email:             pengguna.Email,
-		PhoneNumber:       pengguna.PhoneNumber,
-		ParentPhoneNumber: pengguna.ParentPhoneNumber,
-		SchoolAddress:     pengguna.SchoolAddress,
-		Address:           pengguna.Address,
-		CreatedAt:         pengguna.CreatedAt,
-		UpdatedAt:         pengguna.UpdatedAt,
-	}
-	return response_pengguna, nil
+	return res, nil
 }
+
 func (s *UserServiceImpl) RegisterUser(ctx context.Context, user web.RegisterUserRequest) (web.UserResponse, error) {
 	registeredUser := web.UserResponse{}
 
@@ -169,6 +166,7 @@ func (s *UserServiceImpl) RegisterUser(ctx context.Context, user web.RegisterUse
 	}
 	return registeredUser, nil
 }
+
 func (s *UserServiceImpl) DeleteUser(ctx context.Context, id string) error {
 	tx, err := s.DB.Begin()
 	if err != nil {
@@ -181,32 +179,29 @@ func (s *UserServiceImpl) DeleteUser(ctx context.Context, id string) error {
 	}
 	return nil
 }
+
 func (s *UserServiceImpl) GetAllUser(ctx context.Context) ([]web.UserResponse, error) {
-	var response_pengguna []web.UserResponse
-	tx, err := s.DB.Begin()
+	var res []web.UserResponse
+	users, err := s.UserRepository.GetAllUser(ctx, s.DB)
 	if err != nil {
-		panic(err)
+		return res, err
 	}
-	defer helper.CommitOrRollback(tx)
-	pengguna, err := s.UserRepository.GetAllUser(ctx, tx)
-	if err != nil {
-		return response_pengguna, err
-	}
-	for _, p := range pengguna {
-		response_pengguna = append(response_pengguna, web.UserResponse{
-			Id:                p.Id,
-			Name:              p.Name,
-			Email:             p.Email,
-			PhoneNumber:       p.PhoneNumber,
-			ParentPhoneNumber: p.ParentPhoneNumber,
-			Address:           p.Address,
-			SchoolAddress:     p.SchoolAddress,
-			CreatedAt:         p.CreatedAt,
-			UpdatedAt:         p.UpdatedAt,
+	for _, user := range users {
+		res = append(res, web.UserResponse{
+			Id:                user.Id,
+			Name:              user.Name,
+			Email:             user.Email,
+			PhoneNumber:       user.PhoneNumber,
+			ParentPhoneNumber: user.ParentPhoneNumber,
+			Address:           user.Address,
+			SchoolAddress:     user.SchoolAddress,
+			CreatedAt:         user.CreatedAt,
+			UpdatedAt:         user.UpdatedAt,
 		})
 	}
-	return response_pengguna, nil
+	return res, nil
 }
+
 func (s *UserServiceImpl) UpdateProfileUser(ctx context.Context, id string, request web.UpdateProfileUserRequest) error {
 	err := s.Validate.Struct(request)
 	if err != nil {

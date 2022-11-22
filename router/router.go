@@ -12,7 +12,7 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-func NewRouter(penggunaController controller.UserController, pengurusController controller.AdminController, authController controller.AuthController, eventController controller.EventController, orderController controller.OrderController) *gin.Engine {
+func NewRouter(userController controller.UserController, adminController controller.AdminController, authController controller.AuthController, eventController controller.EventController, orderController controller.OrderController) *gin.Engine {
 	gin.SetMode(config.GinMode())
 	f, err := os.Create(config.PathLog())
 	if err != nil {
@@ -40,15 +40,15 @@ func NewRouter(penggunaController controller.UserController, pengurusController 
 			auth.POST("/register", authController.RegisterController)
 		}
 		// * user
-		api.GET("/users", middleware.JwtAuthMiddleware(), penggunaController.GetAllUserController)
-		api.GET("/users/:id", middleware.JwtAuthMiddleware(), penggunaController.GetUserByIdController)
-		api.DELETE("/users/:id", middleware.JwtAuthMiddleware(), penggunaController.DeleteUserController)
-		api.PUT("/users/profile", middleware.JwtAuthMiddleware(), penggunaController.UpdateProfileUserController)
+		api.GET("/users", middleware.JwtAuthMiddleware(), userController.GetAllUserController)
+		api.GET("/users/:id", middleware.JwtAuthMiddleware(), userController.GetUserByIdController)
+		api.DELETE("/users/:id", middleware.JwtAuthMiddleware(), userController.DeleteUserController)
+		api.PUT("/users/profile", middleware.JwtAuthMiddleware(), userController.UpdateProfileUserController)
 		// * admin
-		api.GET("/admins", middleware.JwtAuthMiddleware(), pengurusController.GetAllAdminController)
-		api.GET("/admins/:id", middleware.JwtAuthMiddleware(), pengurusController.GetAdminByIdController)
-		api.DELETE("/admins/:id", middleware.JwtAuthMiddleware(), pengurusController.DeleteAdminController)
-		api.PUT("/admins/profile", middleware.JwtAuthMiddleware(), pengurusController.UpdateProfileAdminController)
+		api.GET("/admins", middleware.JwtAuthMiddleware(), adminController.GetAllAdminController)
+		api.GET("/admins/:id", middleware.JwtAuthMiddleware(), adminController.GetAdminByIdController)
+		api.DELETE("/admins/:id", middleware.JwtAuthMiddleware(), adminController.DeleteAdminController)
+		api.PUT("/admins/profile", middleware.JwtAuthMiddleware(), adminController.UpdateProfileAdminController)
 		// * event
 		api.POST("/events", middleware.JwtAuthMiddleware(), eventController.AddEvent)
 		api.GET("/events", eventController.GetAllEvents)
