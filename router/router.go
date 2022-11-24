@@ -58,6 +58,9 @@ func NewRouter(userController controller.UserController, adminController control
 			events.POST("/order", middleware.JwtAuthMiddleware(), orderController.CreateOrderEvent)
 			events.PUT("/order/confirm/:id", middleware.JwtAuthMiddleware(), orderController.ConfirmOrder)
 			events.PUT("/order/reject/:id", middleware.JwtAuthMiddleware(), orderController.RejectOrder)
+			events.GET("/order/event/:id", middleware.JwtAuthMiddleware(), orderController.GetOrderByEventId)
+			events.GET("/order/:id", middleware.JwtAuthMiddleware(), orderController.GetOrderById)
+			events.GET("/order/user", middleware.JwtAuthMiddleware(), orderController.GetOrderEventByUser)
 		}
 	}
 	return router

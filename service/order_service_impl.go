@@ -6,12 +6,14 @@ import (
 	"errors"
 	"time"
 
+	"github.com/andil-id/api/exception"
 	"github.com/andil-id/api/helper"
 	"github.com/andil-id/api/model/domain"
 	"github.com/andil-id/api/model/web"
 	"github.com/andil-id/api/repository"
 	"github.com/cloudinary/cloudinary-go/v2"
 	"github.com/go-playground/validator/v10"
+	e "github.com/pkg/errors"
 )
 
 type OrderServiceImpl struct {
@@ -101,5 +103,73 @@ func (s *OrderServiceImpl) CreateOrder(ctx context.Context, data web.CreateOrder
 		UpdatedAt:    now,
 	}
 
+	return res, nil
+}
+
+func (s *OrderServiceImpl) GetOrderEventByUserId(ctx context.Context, id string) ([]web.OrderByUserId, error) {
+	var res []web.OrderByUserId
+	orders, err := s.OrderRepository.GetOrderByUserId(ctx, s.DB, id)
+	if err != nil {
+		return res, err
+	}
+	for _, order := range orders {
+		res = append(res, web.OrderByUserId{
+			Id:        order.Id,
+			UserId:    order.UserId,
+			EventId:   order.EventId,
+			Amount:    order.Amount,
+			Status:    order.Status,
+			CreatedAt: order.CreatedAt,
+			UpdatedAt: order.UpdatedAt,
+			Event: web.Event{
+				Id:       order.EventId,
+				Title:    order.Title,
+				Banner:   order.Banner,
+				Location: order.Location,
+				StartAt:  order.StartAt,
+				EndAt:    order.EndAt,
+			},
+		})
+	}
+	return res, nil
+}
+
+func (s *OrderServiceImpl) GetOrderByEventId(ctx context.Context, id string) ([]web.Order, error) {
+	var res []web.Order
+	orders, err := s.OrderRepository.GetOrderByEventId(ctx, s.DB, id)
+	if err != nil {
+		return res, err
+	}
+	for _, order := range orders {
+		res = append(res, web.Order{
+			Id:           order.Id,
+			UserId:       order.UserId,
+			EventId:      order.EventId,
+			Amount:       order.Amount,
+			ProofPayment: order.ProofPayment,
+			Status:       order.Status,
+			CreatedAt:    order.CreatedAt,
+			UpdatedAt:    order.UpdatedAt,
+		})
+	}
+	return res, nil
+}
+
+func (s *OrderServiceImpl) GetOrderById(ctx context.Context, id string) (web.Order, error) {
+	var res web.Order
+	order, err := s.OrderRepository.GetOrderById(ctx, s.DB, id)
+	if err != nil {
+		return res, e.Wrap(exception.ErrNotFound, err.Error())
+	}
+	res = web.Order{
+		Id:           order.Id,
+		UserId:       order.UserId,
+		EventId:      order.EventId,
+		Amount:       order.Amount,
+		ProofPayment: order.ProofPayment,
+		Status:       order.Status,
+		CreatedAt:    order.CreatedAt,
+		UpdatedAt:    order.UpdatedAt,
+	}
 	return res, nil
 }

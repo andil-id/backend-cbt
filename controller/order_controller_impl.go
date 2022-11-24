@@ -77,3 +77,48 @@ func (cl *OrderControllerImpl) RejectOrder(c *gin.Context) {
 		StatusCode: http.StatusOK,
 	})
 }
+
+func (cl *OrderControllerImpl) GetOrderById(c *gin.Context) {
+	id := c.Param("id")
+	res, err := cl.OrderService.GetOrderById(c.Request.Context(), id)
+	if err != nil {
+		c.Error(err)
+		return
+	}
+	helper.ResponseSuccess(c, res, helper.Meta{
+		StatusCode: http.StatusOK,
+	})
+}
+
+func (cl *OrderControllerImpl) GetOrderByEventId(c *gin.Context) {
+	token := c.MustGet("token").(jwt.MapClaims)
+	if token["role"].(string) != "admin" {
+		c.Error(e.Wrap(exception.ErrUnAuth, ""))
+		return
+	}
+
+	id := c.Param("id")
+	res, err := cl.OrderService.GetOrderByEventId(c.Request.Context(), id)
+	if err != nil {
+		c.Error(err)
+		return
+	}
+	helper.ResponseSuccess(c, res, helper.Meta{
+		TotalData:  len(res),
+		StatusCode: http.StatusOK,
+	})
+}
+
+func (cl *OrderControllerImpl) GetOrderEventByUser(c *gin.Context) {
+	token := c.MustGet("token").(jwt.MapClaims)
+	id := token["id"]
+	res, err := cl.OrderService.GetOrderEventByUserId(c.Request.Context(), fmt.Sprintf("%v", id))
+	if err != nil {
+		c.Error(err)
+		return
+	}
+	helper.ResponseSuccess(c, res, helper.Meta{
+		TotalData:  len(res),
+		StatusCode: http.StatusOK,
+	})
+}

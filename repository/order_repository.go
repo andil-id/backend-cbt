@@ -12,4 +12,6 @@ type OrderRepository interface {
 	SaveOrder(ctx context.Context, tx *sql.Tx, data domain.Orders) (string, error)
 	GetOrderById(ctx context.Context, db *sql.DB, id string) (domain.Orders, error)
 	UpdateOrderStatus(ctx context.Context, tx *sql.Tx, status string, id string) error
+	GetOrderByUserId(ctx context.Context, db *sql.DB, id string) ([]domain.OrderEventByUser, error)
+	GetOrderByEventId(ctx context.Context, db *sql.DB, id string) ([]domain.Orders, error)
 }

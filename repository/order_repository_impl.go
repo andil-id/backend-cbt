@@ -91,7 +91,7 @@ func (r *OrderRepositoryImpl) GetOrderByUserIdAndEventId(ctx context.Context, db
 		}
 		return order, nil
 	}
-	return order, errors.New("event not found")
+	return order, errors.New("order not found")
 }
 
 func (r *OrderRepositoryImpl) UpdateOrderStatus(ctx context.Context, tx *sql.Tx, status string, id string) error {
@@ -101,4 +101,46 @@ func (r *OrderRepositoryImpl) UpdateOrderStatus(ctx context.Context, tx *sql.Tx,
 		return err
 	}
 	return nil
+}
+
+func (r *OrderRepositoryImpl) GetOrderByUserId(ctx context.Context, db *sql.DB, id string) ([]domain.OrderEventByUser, error) {
+	SQL := "SELECT orders.id, orders.user_id, orders.event_id, orders.amount, orders.status, orders.created_at, orders.updated_at, events.title, events.banner, events.location, events.start_at, events.end_at FROM orders LEFT JOIN events ON orders.event_id=events.id WHERE orders.user_id = ?"
+	rows, err := db.QueryContext(ctx, SQL, id)
+	if err != nil {
+		panic(err)
+	}
+	defer rows.Close()
+	var orders []domain.OrderEventByUser
+	for rows.Next() {
+		var order domain.OrderEventByUser
+		err := rows.Scan(&order.Id, &order.UserId, &order.EventId, &order.Amount, &order.Status, &order.CreatedAt, &order.UpdatedAt, &order.Title, &order.Banner, &order.Location, &order.StartAt, &order.EndAt)
+		if err != nil {
+			panic(err)
+		}
+		orders = append(orders, order)
+	}
+	return orders, nil
+}
+
+func (r *OrderRepositoryImpl) GetOrderByEventId(ctx context.Context, db *sql.DB, id string) ([]domain.Orders, error) {
+	SQL := "SELECT * FROM orders WHERE event_id = ?"
+	rows, err := db.QueryContext(ctx, SQL, id)
+	if err != nil {
+		panic(err)
+	}
+	defer rows.Close()
+	var orders []domain.Orders
+	for rows.Next() {
+		var order domain.Orders
+		var proofPayment *sql.NullString
+		err := rows.Scan(&order.Id, &order.UserId, &order.EventId, &order.Amount, &proofPayment, &order.Status, &order.CreatedAt, &order.UpdatedAt)
+		if err != nil {
+			panic(err)
+		}
+		if proofPayment.Valid {
+			order.ProofPayment = proofPayment.String
+		}
+		orders = append(orders, order)
+	}
+	return orders, nil
 }
