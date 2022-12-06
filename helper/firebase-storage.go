@@ -19,7 +19,7 @@ func UploadFileToFirebaseStorageAndGetURL(ctx context.Context, file io.Reader) (
 		ProjectID:     os.Getenv("FIREBASE_PROJECTID"),
 		StorageBucket: os.Getenv("FIREBASE_STORAGEBUCKET"),
 	}
-	opt := option.WithCredentialsFile("/Users/user/project/backend-cbt/helper/cbt-ppsm-firebase-sa.json")
+	opt := option.WithCredentialsFile(os.Getenv("FIREBASE_SERVICEACCOUNT"))
 	app, err := firebase.NewApp(ctx, config, opt)
 	if err != nil {
 		return "", err
