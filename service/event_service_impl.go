@@ -48,10 +48,10 @@ func (s *EventServiceImpl) CreateEvent(ctx context.Context, data web.CreateEvent
 
 	// * checking file type and file size
 	if !slices.Contains(aceptedFiles, certificateExt) || !slices.Contains(aceptedFiles, bannerExt) {
-		return res, e.Wrapf(exception.ErrBadRequest, "format file is not suported: file must be %s format", strings.Join(aceptedFiles, ", "))
+		return res, e.Wrapf(exception.ErrBadRequest, "Format file is not suported: file must be %s format", strings.Join(aceptedFiles, ", "))
 	}
 	if data.Certificate.Size > 5242880 || data.Banner.Size > 5242880 {
-		return res, e.Wrap(exception.ErrBadRequest, "file is to large: maximum file size is 5 mb")
+		return res, e.Wrap(exception.ErrBadRequest, "File is to large: maximum file size is 5 mb")
 	}
 
 	tx, err := s.DB.Begin()
@@ -64,7 +64,7 @@ func (s *EventServiceImpl) CreateEvent(ctx context.Context, data web.CreateEvent
 	if err != nil {
 		return res, err
 	}
-	bannerPath, err := helper.ImageUploader(ctx, s.Cld, banner, "banner")
+	bannerPath, err := helper.UploadFileToFirebaseStorageAndGetURL(ctx, banner)
 	if err != nil {
 		return res, err
 	}
@@ -72,7 +72,7 @@ func (s *EventServiceImpl) CreateEvent(ctx context.Context, data web.CreateEvent
 	if err != nil {
 		return res, err
 	}
-	certificatePath, err := helper.ImageUploader(ctx, s.Cld, certificate, "certificate")
+	certificatePath, err := helper.UploadFileToFirebaseStorageAndGetURL(ctx, certificate)
 	if err != nil {
 		return res, err
 	}
