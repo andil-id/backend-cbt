@@ -44,12 +44,12 @@ func (cl *OrderControllerImpl) CreateOrderEvent(c *gin.Context) {
 
 func (cl *OrderControllerImpl) ConfirmOrder(c *gin.Context) {
 	token := c.MustGet("token").(jwt.MapClaims)
-	if token["role"].(string) != "admin" {
+	id := c.Param("id")
+	fmt.Println(id)
+	if token["role"].(string) == "admin" {
 		c.Error(e.Wrap(exception.ErrUnAuth, ""))
 		return
 	}
-
-	id := c.Param("id")
 	err := cl.OrderService.UpdateOrderStatus(c.Request.Context(), "confirm", id)
 	if err != nil {
 		c.Error(err)
