@@ -20,7 +20,6 @@ func JwtAuthMiddleware() gin.HandlerFunc {
 			return
 		}
 		tokenString := strings.Replace(authorizationToken, "Bearer ", "", -1)
-
 		// * check signing method in token
 		token, err := jwt.Parse(tokenString, func(token *jwt.Token) (interface{}, error) {
 			if method, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {

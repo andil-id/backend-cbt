@@ -28,7 +28,6 @@ func (cl *EventControllerImpl) AddEvent(c *gin.Context) {
 		c.Error(e.Wrap(exception.ErrUnAuth, ""))
 		return
 	}
-
 	req := web.CreateEventRequest{}
 	err := c.Bind(&req)
 	if err != nil {
