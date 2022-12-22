@@ -13,9 +13,9 @@ type Event struct {
 	Certificate     string    `json:"certificate,omitempty"`
 	Price           int       `json:"price"`
 	Type            string    `json:"type,omitempty"`
-	BankAccountNum  *string   `json:"bank_account_number"`
-	BankAccountName *string   `json:"bank_account_name"`
-	RecipientName   *string   `json:"recipient_name"`
+	BankAccountNum  string   `json:"bank_account_number"`
+	BankAccountName string   `json:"bank_account_name"`
+	RecipientName   string   `json:"recipient_name"`
 	Location        string    `json:"location,omitempty"`
 	StartAt         time.Time `json:"start_at,omitempty"`
 	EndAt           time.Time `json:"end_at,omitempty"`
