@@ -134,22 +134,25 @@ func (s *OrderServiceImpl) GetOrderEventByUserId(ctx context.Context, id string)
 	return res, nil
 }
 
-func (s *OrderServiceImpl) GetOrderByEventId(ctx context.Context, id string) ([]web.Order, error) {
-	var res []web.Order
+func (s *OrderServiceImpl) GetOrderByEventId(ctx context.Context, id string) ([]web.OrderByEventId, error) {
+	var res []web.OrderByEventId
 	orders, err := s.OrderRepository.GetOrderByEventId(ctx, s.DB, id)
 	if err != nil {
 		return res, err
 	}
 	for _, order := range orders {
-		res = append(res, web.Order{
+		res = append(res, web.OrderByEventId{
 			Id:           order.Id,
-			UserId:       order.UserId,
 			EventId:      order.EventId,
 			Amount:       order.Amount,
 			ProofPayment: order.ProofPayment,
 			Status:       order.Status,
-			CreatedAt:    order.CreatedAt,
-			UpdatedAt:    order.UpdatedAt,
+			User: web.OrderByEventIdData{
+				UserId: order.UserId,
+				Name:   order.Name,
+			},
+			CreatedAt: order.CreatedAt,
+			UpdatedAt: order.UpdatedAt,
 		})
 	}
 	return res, nil

@@ -122,18 +122,18 @@ func (r *OrderRepositoryImpl) GetOrderByUserId(ctx context.Context, db *sql.DB, 
 	return orders, nil
 }
 
-func (r *OrderRepositoryImpl) GetOrderByEventId(ctx context.Context, db *sql.DB, id string) ([]domain.Orders, error) {
-	SQL := "SELECT * FROM orders WHERE event_id = ?"
+func (r *OrderRepositoryImpl) GetOrderByEventId(ctx context.Context, db *sql.DB, id string) ([]domain.OrderByEventId, error) {
+	SQL := "SELECT orders.id, orders.user_id, orders.event_id, orders.amount, orders.proof_payment, orders.status, orders.created_at, orders.updated_at, users.name FROM orders LEFT JOIN users ON orders.user_id = users.id WHERE orders.event_id = ?"
 	rows, err := db.QueryContext(ctx, SQL, id)
 	if err != nil {
 		panic(err)
 	}
 	defer rows.Close()
-	var orders []domain.Orders
+	var orders []domain.OrderByEventId
 	for rows.Next() {
-		var order domain.Orders
+		var order domain.OrderByEventId
 		var proofPayment *sql.NullString
-		err := rows.Scan(&order.Id, &order.UserId, &order.EventId, &order.Amount, &proofPayment, &order.Status, &order.CreatedAt, &order.UpdatedAt)
+		err := rows.Scan(&order.Id, &order.UserId, &order.EventId, &order.Amount, &proofPayment, &order.Status, &order.CreatedAt, &order.UpdatedAt, &order.Name)
 		if err != nil {
 			panic(err)
 		}

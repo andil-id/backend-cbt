@@ -27,3 +27,15 @@ type OrderEventByUser struct {
 	StartAt   time.Time
 	EndAt     time.Time
 }
+
+type OrderByEventId struct {
+	Id           string
+	UserId       string
+	EventId      string
+	Amount       int
+	ProofPayment string
+	Status       string
+	CreatedAt    time.Time
+	UpdatedAt    time.Time
+	Name         string
+}

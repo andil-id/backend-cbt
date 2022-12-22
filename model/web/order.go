@@ -32,3 +32,18 @@ type OrderByUserId struct {
 	UpdatedAt time.Time `json:"updated_at,omitempty"`
 	Event     Event     `json:"event"`
 }
+
+type OrderByEventIdData struct {
+	UserId string `json:"id"`
+	Name   string `json:"name"`
+}
+type OrderByEventId struct {
+	Id           string             `json:"id"`
+	EventId      string             `json:"event_id"`
+	Amount       int                `json:"amount"`
+	ProofPayment string             `json:"proof_of_payment"`
+	Status       string             `json:"status"`
+	User         OrderByEventIdData `json:"user"`
+	CreatedAt    time.Time          `json:"created_at"`
+	UpdatedAt    time.Time          `json:"updated_at"`
+}
