@@ -6,3 +6,4 @@ nginx-conf/*
 gin-bin.exe
 log/*
 firebase-storage-sa.json
+*.exe

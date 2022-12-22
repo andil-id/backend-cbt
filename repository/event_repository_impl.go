@@ -67,18 +67,20 @@ func (r *EventRepositoryImpl) GetAllEvents(ctx context.Context, db *sql.DB) ([]d
 			event.RecipientName = recipientName.String
 		}
 		events = append(events, event)
+
 	}
 	return events, nil
 }
-
 func (r *EventRepositoryImpl) GetEventById(ctx context.Context, db *sql.DB, id string) (domain.Events, error) {
 	SQL := "SELECT * FROM events WHERE id = ?"
 	rows, err := db.QueryContext(ctx, SQL, id)
 	if err != nil {
 		panic(err)
 	}
-	var event domain.Events
+	defer rows.Close()
+
 	if rows.Next() {
+		var event domain.Events
 		var bankAccountNum sql.NullString
 		var bankAccountName sql.NullString
 		var recipientName sql.NullString
@@ -86,16 +88,28 @@ func (r *EventRepositoryImpl) GetEventById(ctx context.Context, db *sql.DB, id s
 		if err != nil {
 			panic(err)
 		}
+
+		// handle null values
 		if bankAccountNum.Valid {
 			event.BankAccountNum = bankAccountNum.String
+		} else {
+			event.BankAccountNum = "" // or some default value
 		}
+
 		if bankAccountName.Valid {
 			event.BackAccountName = bankAccountName.String
+		} else {
+			event.BackAccountName = "" // or some default value
 		}
+
 		if recipientName.Valid {
 			event.RecipientName = recipientName.String
+		} else {
+			event.RecipientName = "" // or some default value
 		}
+
 		return event, nil
 	}
-	return event, errors.New("event not found")
+
+	return domain.Events{}, errors.New("event not found")
 }
