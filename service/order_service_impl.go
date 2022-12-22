@@ -74,7 +74,7 @@ func (s *OrderServiceImpl) CreateOrder(ctx context.Context, data web.CreateOrder
 	if err != nil {
 		return res, err
 	}
-	proofPaymentPath, err := helper.ImageUploader(ctx, s.Cld, proofPayment, "payment")
+	proofPaymentPath, err := helper.UploadFileToFirebaseStorageAndGetURL(ctx, proofPayment)
 	if err != nil {
 		return res, err
 	}

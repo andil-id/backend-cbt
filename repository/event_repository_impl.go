@@ -4,7 +4,6 @@ import (
 	"context"
 	"database/sql"
 	"errors"
-	"log"
 	"time"
 
 	"github.com/andil-id/api/model/domain"
@@ -42,7 +41,6 @@ func (r *EventRepositoryImpl) SaveEvent(ctx context.Context, tx *sql.Tx, event d
 }
 
 func (r *EventRepositoryImpl) GetAllEvents(ctx context.Context, db *sql.DB) ([]domain.Events, error) {
-	log.Println("masuk sini mas")
 	SQL := "SELECT * FROM events"
 	rows, err := db.QueryContext(ctx, SQL)
 	if err != nil {

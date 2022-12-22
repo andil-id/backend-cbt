@@ -45,8 +45,7 @@ func (cl *OrderControllerImpl) CreateOrderEvent(c *gin.Context) {
 func (cl *OrderControllerImpl) ConfirmOrder(c *gin.Context) {
 	token := c.MustGet("token").(jwt.MapClaims)
 	id := c.Param("id")
-	fmt.Println(id)
-	if token["role"].(string) == "admin" {
+	if token["role"].(string) != "admin" {
 		c.Error(e.Wrap(exception.ErrUnAuth, ""))
 		return
 	}

@@ -3,6 +3,7 @@ module github.com/andil-id/api
 go 1.18
 
 require (
+	firebase.google.com/go v3.13.0+incompatible
 	github.com/cloudinary/cloudinary-go/v2 v2.2.0
 	github.com/gin-gonic/gin v1.7.7
 	github.com/go-playground/validator/v10 v10.10.1
@@ -11,9 +12,11 @@ require (
 	github.com/joho/godotenv v1.4.0
 	github.com/pkg/errors v0.9.1
 	github.com/segmentio/ksuid v1.0.4
+	github.com/thanhpk/randstr v1.0.4
 	golang.org/x/crypto v0.0.0-20220411220226-7b82a4e95df4
 	golang.org/x/exp v0.0.0-20221114191408-850992195362
 	golang.org/x/text v0.4.0
+	google.golang.org/api v0.103.0
 )
 
 require (
@@ -24,7 +27,6 @@ require (
 	cloud.google.com/go/iam v0.7.0 // indirect
 	cloud.google.com/go/longrunning v0.3.0 // indirect
 	cloud.google.com/go/storage v1.28.1 // indirect
-	firebase.google.com/go v3.13.0+incompatible // indirect
 	github.com/creasty/defaults v1.5.1 // indirect
 	github.com/gin-contrib/sse v0.1.0 // indirect
 	github.com/go-playground/locales v0.14.0 // indirect
@@ -41,7 +43,6 @@ require (
 	github.com/mattn/go-isatty v0.0.12 // indirect
 	github.com/modern-go/concurrent v0.0.0-20180228061459-e0a39a4cb421 // indirect
 	github.com/modern-go/reflect2 v0.0.0-20180701023420-4b7aa43c6742 // indirect
-	github.com/thanhpk/randstr v1.0.4 // indirect
 	github.com/ugorji/go/codec v1.1.7 // indirect
 	go.opencensus.io v0.24.0 // indirect
 	golang.org/x/net v0.2.0 // indirect
@@ -50,7 +51,6 @@ require (
 	golang.org/x/sys v0.2.0 // indirect
 	golang.org/x/time v0.1.0 // indirect
 	golang.org/x/xerrors v0.0.0-20220907171357-04be3eba64a2 // indirect
-	google.golang.org/api v0.103.0 // indirect
 	google.golang.org/appengine v1.6.7 // indirect
 	google.golang.org/genproto v0.0.0-20221201164419-0e50fba7f41c // indirect
 	google.golang.org/grpc v1.50.1 // indirect
