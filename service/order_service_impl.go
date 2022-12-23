@@ -158,21 +158,24 @@ func (s *OrderServiceImpl) GetOrderByEventId(ctx context.Context, id string) ([]
 	return res, nil
 }
 
-func (s *OrderServiceImpl) GetOrderById(ctx context.Context, id string) (web.Order, error) {
-	var res web.Order
+func (s *OrderServiceImpl) GetOrderById(ctx context.Context, id string) (web.OrderById, error) {
+	var res web.OrderById
 	order, err := s.OrderRepository.GetOrderById(ctx, s.DB, id)
 	if err != nil {
 		return res, e.Wrap(exception.ErrNotFound, err.Error())
 	}
-	res = web.Order{
+	res = web.OrderById{
 		Id:           order.Id,
 		UserId:       order.UserId,
-		EventId:      order.EventId,
 		Amount:       order.Amount,
 		ProofPayment: order.ProofPayment,
 		Status:       order.Status,
-		CreatedAt:    order.CreatedAt,
-		UpdatedAt:    order.UpdatedAt,
+		Event: web.OrderByIdData{
+			EventId:  order.EventId,
+			Location: order.Location,
+		},
+		CreatedAt: order.CreatedAt,
+		UpdatedAt: order.UpdatedAt,
 	}
 	return res, nil
 }

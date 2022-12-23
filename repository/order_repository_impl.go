@@ -52,16 +52,16 @@ func (r *OrderRepositoryImpl) SaveOrder(ctx context.Context, tx *sql.Tx, data do
 	return id, nil
 }
 
-func (r *OrderRepositoryImpl) GetOrderById(ctx context.Context, db *sql.DB, id string) (domain.Orders, error) {
-	SQL := "SELECT * FROM orders WHERE id = ?"
+func (r *OrderRepositoryImpl) GetOrderById(ctx context.Context, db *sql.DB, id string) (domain.OrderById, error) {
+	SQL := "SELECT orders.id, orders.user_id, orders.event_id, orders.amount, orders.proof_payment, orders.status, orders.created_at, orders.updated_at, events.location FROM orders LEFT JOIN events ON orders.event_id=events.id WHERE orders.id = ?"
 	rows, err := db.QueryContext(ctx, SQL, id)
 	if err != nil {
 		panic(err)
 	}
-	var order domain.Orders
+	var order domain.OrderById
 	var proofPayment *sql.NullString
 	if rows.Next() {
-		err := rows.Scan(&order.Id, &order.UserId, &order.EventId, &order.Amount, &proofPayment, &order.Status, &order.CreatedAt, &order.UpdatedAt)
+		err := rows.Scan(&order.Id, &order.UserId, &order.EventId, &order.Amount, &proofPayment, &order.Status, &order.CreatedAt, &order.UpdatedAt, &order.Location)
 		if err != nil {
 			panic(err)
 		}

@@ -8,7 +8,7 @@ import (
 
 type OrderService interface {
 	// GetAllOrder(ctx context.Context) (error, []web.Order)
-	GetOrderById(ctx context.Context, id string) (web.Order, error)
+	GetOrderById(ctx context.Context, id string) (web.OrderById, error)
 	CreateOrder(ctx context.Context, data web.CreateOrderRequest, userId string) (web.Order, error)
 	// GetOrderUserByEventId(ctx context.Context, userId string, eventId string) (error, web.Order)
 	UpdateOrderStatus(ctx context.Context, status string, id string) error

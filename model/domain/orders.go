@@ -39,3 +39,15 @@ type OrderByEventId struct {
 	UpdatedAt    time.Time
 	Name         string
 }
+
+type OrderById struct {
+	Id           string
+	UserId       string
+	EventId      string
+	Amount       int
+	ProofPayment string
+	Status       string
+	CreatedAt    time.Time
+	UpdatedAt    time.Time
+	Location     string
+}
